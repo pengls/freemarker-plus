@@ -31,8 +31,12 @@ class FtlMethodUsageSearcher : QueryExecutorBase<PsiReference, ReferencesSearch.
         if (name.isEmpty()) return
 
         val project = declaration.project
+        val scope = queryParameters.effectiveSearchScope
         val files = FileTypeIndex.getFiles(FreemarkerFileType, GlobalSearchScope.allScope(project))
         for (vf in files) {
+            // 尊重 Find Usages 传入的搜索范围（如「在目录/文件中查找」），
+            // 而不是始终返回项目级全部结果。
+            if (!scope.contains(vf)) continue
             val file = PsiManager.getInstance(project).findFile(vf) as? FtlFile ?: continue
             for (ident in PsiTreeUtil.findChildrenOfType(file, FtlIdentifier::class.java)) {
                 if (ident.text != name) continue

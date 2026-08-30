@@ -93,4 +93,13 @@ class FtlFindUsagesTest : BasePlatformTestCase() {
         myFixture.renameElementAtCaret("u2")
         assertEquals("<#assign u2 = \"a\">\n\${u2}\n\${u2}", myFixture.file.text)
     }
+
+    // 重命名 import 别名应被拒绝：别名没有指向自身的引用（lib.member 解析到被导入文件的
+    // 成员声明），改名只会静默脱钩所有 lib.member 使用处。canProcessElement 返回 false
+    // 后重命名应为 no-op，文件文本保持不变。
+    fun testRenameImportAliasIsRejected() {
+        myFixture.configureByText("main.ftl", "<#import \"lib.ftl\" as li<caret>b>")
+        myFixture.renameElementAtCaret("lib2")
+        assertEquals("<#import \"lib.ftl\" as lib>", myFixture.file.text)
+    }
 }

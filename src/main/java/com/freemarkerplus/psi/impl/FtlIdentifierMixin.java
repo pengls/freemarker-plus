@@ -1,6 +1,7 @@
 package com.freemarkerplus.psi.impl;
 
 import com.freemarkerplus.psi.FtlIdentifier;
+import com.freemarkerplus.psi.FtlImportDirective;
 import com.freemarkerplus.psi.FtlPsiUtil;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
@@ -46,6 +47,11 @@ public abstract class FtlIdentifierMixin extends ASTWrapperPsiElement
 
   @Override
   public PsiElement setName(@NotNull String name) throws IncorrectOperationException {
+    // <#import "x.ftl" as ns> 的别名 ns 没有指向自身的引用（命名空间引用 lib.member 解析到
+    // 被导入文件的成员声明），改名只会静默脱钩所有 ns.member 使用处，故直接拒绝（no-op）。
+    if (getParent() instanceof FtlImportDirective) {
+      return this;
+    }
     FtlIdentifier replacement = FtlPsiUtil.INSTANCE.createIdentifier(getProject(), name);
     return replacement != null ? replace(replacement) : this;
   }

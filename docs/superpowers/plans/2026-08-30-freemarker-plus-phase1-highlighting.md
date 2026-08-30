@@ -185,9 +185,9 @@ git commit -m "chore: scaffold IntelliJ plugin project (Kotlin + IPGP 2.x)"
 **Interfaces:**
 - Produces:
   - `FreemarkerLanguage.INSTANCE`（`Language` + `TemplateLanguage`）
-  - `FreemarkerFileType.INSTANCE`（`LanguageFileType` + `TemplateFileType`）
+  - `FreemarkerFileType.INSTANCE`（`LanguageFileType`）
   - `FreemarkerTokenTypes.*`（`IElementType` 常量）
-  - `FreemarkerLexer`（实现 `com.intellij.lexer.Lexer`，输出 `TemplateDataElementType.TEMPLATE_DATA` 与 `FreemarkerTokenTypes.*`）
+  - `FreemarkerLexer`（实现 `com.intellij.lexer.Lexer`，输出 `FreemarkerTokenTypes.*`，含数据区 `TEMPLATE_DATA`）
 
 - [ ] **Step 1: 写语言定义**
 
@@ -216,10 +216,9 @@ package com.freemarkerplus.lang
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.fileTypes.LanguageFileType
-import com.intellij.psi.templateLanguages.TemplateFileType
 import javax.swing.Icon
 
-object FreemarkerFileType : LanguageFileType(FreemarkerLanguage.INSTANCE), TemplateFileType {
+object FreemarkerFileType : LanguageFileType(FreemarkerLanguage.INSTANCE) {
     override fun getName(): String = "FreeMarker Template"
     override fun getDescription(): String = "FreeMarker template file"
     override fun getDefaultExtension(): String = "ftl"
@@ -265,7 +264,6 @@ package com.freemarkerplus.lexer
 
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
-import com.intellij.psi.templateLanguages.TemplateDataElementType
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 
 class FreemarkerLexerTest : BasePlatformTestCase() {
@@ -342,12 +340,12 @@ class FreemarkerLexerTest : BasePlatformTestCase() {
 
     fun testEscapedInterpolationIsData() {
         val text = "\\\${x}"
-        assertEquals(listOf<TemplateDataElementType>(TemplateDataElementType.TEMPLATE_DATA), types(text))
+        assertEquals(listOf(FreemarkerTokenTypes.TEMPLATE_DATA), types(text))
     }
 
     fun testPlainHtmlIsData() {
         val text = "<div class=\"a\">text</div>"
-        assertEquals(listOf<TemplateDataElementType>(TemplateDataElementType.TEMPLATE_DATA), types(text))
+        assertEquals(listOf(FreemarkerTokenTypes.TEMPLATE_DATA), types(text))
     }
 }
 ```
@@ -370,7 +368,6 @@ package com.freemarkerplus.lexer
 import com.intellij.lexer.LexerBase
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
-import com.intellij.psi.templateLanguages.TemplateDataElementType
 
 class FreemarkerLexer : LexerBase() {
 
@@ -395,6 +392,7 @@ class FreemarkerLexer : LexerBase() {
         this.tokenType = null
         this.mode = Mode.DATA
         this.expectName = false
+        advance()
     }
 
     override fun getState(): Int = 0
@@ -472,7 +470,7 @@ class FreemarkerLexer : LexerBase() {
             if (isFreemarkerStart(pos)) break
             pos++
         }
-        tokenType = TemplateDataElementType.TEMPLATE_DATA
+        tokenType = FreemarkerTokenTypes.TEMPLATE_DATA
         tokenEnd = pos
     }
 
@@ -698,7 +696,7 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.tree.IElementType
-import com.intellij.psi.templateLanguages.TemplateDataElementType
+import com.freemarkerplus.lexer.FreemarkerTokenTypes
 
 class FreemarkerSyntaxHighlighter(
     private val project: Project?,
@@ -714,7 +712,7 @@ class FreemarkerSyntaxHighlighter(
         htmlHighlighter?.let {
             layered.registerSelfStoppingLayer(
                 it.highlightingLexer,
-                arrayOf(TemplateDataElementType.TEMPLATE_DATA),
+                arrayOf(FreemarkerTokenTypes.TEMPLATE_DATA),
                 IElementType.EMPTY_ARRAY
             )
         }
@@ -875,9 +873,9 @@ git commit -m "feat: add syntax highlighter with HTML overlay and register file 
         val text = "<style>.a { color: red; }</style>"
         assertEquals(
             listOf(
-                TemplateDataElementType.TEMPLATE_DATA,   // <style>
+                FreemarkerTokenTypes.TEMPLATE_DATA,   // <style>
                 FreemarkerTokenTypes.STYLE_DATA,          // .a { color: red; }
-                TemplateDataElementType.TEMPLATE_DATA    // </style>
+                FreemarkerTokenTypes.TEMPLATE_DATA    // </style>
             ),
             types(text)
         )
@@ -887,9 +885,9 @@ git commit -m "feat: add syntax highlighter with HTML overlay and register file 
         val text = "<script>var x = 1;</script>"
         assertEquals(
             listOf(
-                TemplateDataElementType.TEMPLATE_DATA,   // <script>
+                FreemarkerTokenTypes.TEMPLATE_DATA,   // <script>
                 FreemarkerTokenTypes.SCRIPT_DATA,         // var x = 1;
-                TemplateDataElementType.TEMPLATE_DATA    // </script>
+                FreemarkerTokenTypes.TEMPLATE_DATA    // </script>
             ),
             types(text)
         )
@@ -979,12 +977,12 @@ git commit -m "feat: add syntax highlighter with HTML overlay and register file 
         if (gt >= 0) {
             val selfClosing = gt > pos && buffer[gt - 1] == '/'
             pos = gt + 1
-            tokenType = TemplateDataElementType.TEMPLATE_DATA
+            tokenType = FreemarkerTokenTypes.TEMPLATE_DATA
             tokenEnd = pos
             mode = if (selfClosing) Mode.DATA else contentMode
         } else {
             pos = endOffset
-            tokenType = TemplateDataElementType.TEMPLATE_DATA
+            tokenType = FreemarkerTokenTypes.TEMPLATE_DATA
             tokenEnd = pos
         }
     }
@@ -1054,7 +1052,7 @@ import com.intellij.lang.javascript.JavaScriptLanguage
         htmlHighlighter?.let {
             layered.registerSelfStoppingLayer(
                 it.highlightingLexer,
-                arrayOf(TemplateDataElementType.TEMPLATE_DATA),
+                arrayOf(FreemarkerTokenTypes.TEMPLATE_DATA),
                 IElementType.EMPTY_ARRAY
             )
         }

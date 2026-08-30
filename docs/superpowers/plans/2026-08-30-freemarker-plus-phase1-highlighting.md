@@ -33,7 +33,7 @@ freemarker-plus/
 ├── .gitignore
 ├── src/main/kotlin/com/freemarkerplus/
 │   ├── lang/FreemarkerLanguage.kt                      # 语言定义（TemplateLanguage 标记）
-│   ├── lang/FreemarkerFileType.kt                      # .ftl 文件类型（TemplateFileType 标记）
+│   ├── lang/FreemarkerFileType.kt                      # .ftl 文件类型（LanguageFileType）
 │   ├── lexer/FreemarkerTokenType.kt                    # Freemarker token 类型定义
 │   ├── lexer/FreemarkerLexer.kt                        # 手写有状态词法分析器（核心）
 │   ├── highlighting/FreemarkerColors.kt                # TextAttributesKey 定义 + token→key 映射

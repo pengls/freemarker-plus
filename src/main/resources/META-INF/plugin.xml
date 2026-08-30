@@ -10,4 +10,14 @@
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="FreeMarker Template"
+                  implementationClass="com.freemarkerplus.lang.FreemarkerFileType"
+                  fieldName="INSTANCE"
+                  language="FTL"
+                  extensions="ftl"/>
+        <lang.syntaxHighlighterFactory language="FTL"
+                                       implementationClass="com.freemarkerplus.highlighting.FreemarkerSyntaxHighlighterFactory"/>
+    </extensions>
 </idea-plugin>

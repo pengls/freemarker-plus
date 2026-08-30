@@ -1,23 +1,8 @@
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
-import org.gradle.api.tasks.testing.Test
-import org.gradle.process.CommandLineArgumentProvider
-
-fun stripCoroutinesAgent(providers: MutableList<CommandLineArgumentProvider>) {
-    val stripped = providers.map { original ->
-        object : CommandLineArgumentProvider {
-            override fun asArguments(): Iterable<String> =
-                original.asArguments().filterNot {
-                    it.startsWith("-javaagent:") && it.contains("coroutines-javaagent")
-                }
-        }
-    }
-    providers.clear()
-    providers.addAll(stripped)
-}
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.1.20"
-    id("org.jetbrains.intellij.platform") version "2.9.0"
+    id("org.jetbrains.kotlin.jvm") version "2.3.0"
+    id("org.jetbrains.intellij.platform") version "2.16.0"
 }
 
 group = "com.freemarkerplus"
@@ -33,8 +18,10 @@ repositories {
 dependencies {
     intellijPlatform {
         intellijIdea("2026.2")
-        // testFramework(TestFrameworkType.Platform) — disabled: IPGP 2.9.0 can't parse IDEA 2026.2 module descriptors
+        testFramework(TestFrameworkType.Platform)
     }
+
+    testImplementation("junit:junit:4.13.2")
 }
 
 kotlin {
@@ -45,11 +32,4 @@ tasks {
     buildSearchableOptions {
         enabled = false
     }
-}
-
-tasks.withType<JavaExec>().configureEach {
-    stripCoroutinesAgent(jvmArgumentProviders)
-}
-tasks.withType<Test>().configureEach {
-    stripCoroutinesAgent(jvmArgumentProviders)
 }

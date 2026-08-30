@@ -65,7 +65,7 @@ freemarker-plus/
     └── navigation/FtlFindUsagesTest.kt                 # 查找引用/重命名测试
 ```
 
-> 说明：GrammarKit 生成的 `FtlParser.kt`、`_FtlLexer.kt`、`FtlElementTypes.kt`、`FtlTokenTypes.kt` 及 `Ftl*Impl` 落入 `build/generated/`，不进源码树；仅 `Freemarker.bnf`、`FtlElementType.kt`、`FtlTokenType.kt`、`FtlParserDefinition`、`FtlFile` 及手写补充类进 `src/`。
+> 说明：GrammarKit 生成 Java 产物 `FtlParser.java`、`_FtlLexer.java`、`FtlElementTypes.java`（含 token 常量，无独立 `FtlTokenTypes`）及 PSI 接口/实现，落入 `src/main/gen/`；`Freemarker.bnf`、`_FtlLexer.flex`、`FtlElementType.kt`、`FtlTokenType.kt`、`FtlParserDefinition`、`FtlFile` 及手写补充类进 `src/`。
 
 ---
 
@@ -83,7 +83,7 @@ freemarker-plus/
 - Produces:
   - `FtlElementType(debugName: String) : IElementType(debugName, FreemarkerLanguage.INSTANCE)`
   - `FtlTokenType(debugName: String) : IElementType(debugName, FreemarkerLanguage.INSTANCE)`
-  - 生成的 `com.freemarkerplus.psi.FtlParser`、`com.freemarkerplus.psi.FtlLexer`、`com.freemarkerplus.psi.FtlElementTypes`、`com.freemarkerplus.psi.FtlTokenTypes`
+  - 生成的 `com.freemarkerplus.psi.FtlParser`、`com.freemarkerplus.psi._FtlLexer`、`com.freemarkerplus.psi.FtlElementTypes`（含 token 常量）
 
 - [ ] **Step 1: 确定 grammarKit 插件版本**
 
@@ -242,7 +242,7 @@ string_literal    ::= STRING_LITERAL
 ./gradlew generateFtlParser
 ```
 
-预期：在 `build/generated/`（或 `src/main/gen/`）生成 `FtlParser.kt`、`FtlLexer.kt`、`FtlElementTypes.kt`、`FtlTokenTypes.kt` 等，无 BNF 报错。若报 `TEMPLATE_DATA` 未定义——那是 §7 模板语言机制要用的 `TemplateDataElementType`，本 Task 先临时把它从语法里去掉或用 `IDENTIFIER` 占位，Task 3 再补回。
+预期：在 `src/main/gen/` 生成 `FtlParser.java`、`_FtlLexer.java`、`FtlElementTypes.java`（含 token 常量）等，无 BNF 报错。`TEMPLATE_DATA` 已作为正则 token 声明（数据区叶节点）；若 BNF 报错，按错误信息修正正则或 token 顺序。
 
 - [ ] **Step 7: 编译**
 
@@ -408,7 +408,7 @@ git commit -m "feat: register FTL parser definition and PSI file root"
 - Test: `src/test/kotlin/com/freemarkerplus/psi/FtlParserTest.kt`（加数据区用例）
 
 **Interfaces:**
-- Consumes: `FtlParserDefinition`、`FtlFile`（Task 2）、`FtlTokenTypes.TEMPLATE_DATA`（Task 1 生成）
+- Consumes: `FtlParserDefinition`、`FtlFile`（Task 2）、`FtlElementTypes.TEMPLATE_DATA`（Task 1 生成）
 - Produces: 无新组件（验证任务）
 
 - [ ] **Step 1: 加数据区/混排 PSI 测试（先失败）**
@@ -419,7 +419,7 @@ git commit -m "feat: register FTL parser definition and PSI file root"
 fun testHtmlDataIsTemplateDataLeaf() {
     val file = parse("<div>hello</div>")
     val dataLeaves = PsiTreeUtil.collectElementsOfType(file, com.intellij.psi.PsiElement::class.java)
-        .filter { it.node?.elementType == FtlTokenTypes.TEMPLATE_DATA }
+        .filter { it.node?.elementType == FtlElementTypes.TEMPLATE_DATA }
     assertTrue(dataLeaves.isNotEmpty())
 }
 

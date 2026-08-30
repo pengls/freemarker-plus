@@ -73,4 +73,24 @@ class FtlFindUsagesTest : BasePlatformTestCase() {
         assertEquals("x", defs.single().text)
         assertEquals(lib.virtualFile, defs.single().containingFile.virtualFile)
     }
+
+    // 重命名声明名：声明与所有引用处同步改名。
+    fun testRenameMacro() {
+        myFixture.configureByText("main.ftl", "<#macro m<caret>>a</#macro>\n<@m/>\n<@m/>")
+        myFixture.renameElementAtCaret("m2")
+        assertEquals("<#macro m2>a</#macro>\n<@m2/>\n<@m2/>", myFixture.file.text)
+    }
+
+    // 重命名引用处（解析到声明后）同样应同步改名声明与所有引用处。
+    fun testRenameMacroFromUsage() {
+        myFixture.configureByText("main.ftl", "<#macro m>a</#macro>\n<@m<caret>/>\n<@m/>")
+        myFixture.renameElementAtCaret("m2")
+        assertEquals("<#macro m2>a</#macro>\n<@m2/>\n<@m2/>", myFixture.file.text)
+    }
+
+    fun testRenameVariable() {
+        myFixture.configureByText("main.ftl", "<#assign user<caret> = \"a\">\n\${user}\n\${user}")
+        myFixture.renameElementAtCaret("u2")
+        assertEquals("<#assign u2 = \"a\">\n\${u2}\n\${u2}", myFixture.file.text)
+    }
 }

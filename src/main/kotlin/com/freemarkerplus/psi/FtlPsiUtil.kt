@@ -1,6 +1,9 @@
 package com.freemarkerplus.psi
 
+import com.freemarkerplus.lang.FreemarkerLanguage
+import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.util.PsiTreeUtil
 
 object FtlPsiUtil {
@@ -32,5 +35,16 @@ object FtlPsiUtil {
             true
         }
         return result
+    }
+
+    // 生成一个携带指定文本的独立 FtlIdentifier：解析一个哑 <#macro name> 并取其中的
+    // name 标识符。重命名（setName / FtlIdentifierManipulator）用它作为替换元素，
+    // 以保证替换节点带有正确的 PSI 结构/缩进信息（直接 new LeafPsiElement 会触发
+    // PostprocessReformattingAspect 的缩进断言）。
+    fun createIdentifier(project: Project, name: String): FtlIdentifier? {
+        val dummy = PsiFileFactory.getInstance(project)
+            .createFileFromText("dummy.ftl", FreemarkerLanguage.INSTANCE, "<#macro $name>")
+            ?: return null
+        return PsiTreeUtil.findChildOfType(dummy, FtlMacroDirective::class.java)?.identifier
     }
 }

@@ -28,6 +28,8 @@
                                   implementation="com.freemarkerplus.reference.FtlReferenceContributor"/>
         <lang.elementManipulator forClass="com.freemarkerplus.psi.FtlStringLiteral"
                                  implementationClass="com.freemarkerplus.reference.FtlStringManipulator"/>
+        <lang.elementManipulator forClass="com.freemarkerplus.psi.FtlIdentifier"
+                                 implementationClass="com.freemarkerplus.reference.FtlIdentifierManipulator"/>
         <fileBasedIndex implementation="com.freemarkerplus.reference.FtlFileIndex"/>
         <lang.findUsagesProvider language="FTL"
                                  implementationClass="com.freemarkerplus.navigation.FtlFindUsagesProvider"/>
@@ -39,5 +41,6 @@
         <lang.foldingBuilder language="FTL"
                              implementationClass="com.freemarkerplus.navigation.FtlFoldingBuilder"/>
         <breadcrumbsInfoProvider implementation="com.freemarkerplus.navigation.FtlBreadcrumbsInfoProvider"/>
+        <renamePsiElementProcessor implementation="com.freemarkerplus.navigation.FtlRenameProcessor"/>
     </extensions>
 </idea-plugin>

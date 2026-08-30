@@ -102,4 +102,16 @@ class FtlFindUsagesTest : BasePlatformTestCase() {
         myFixture.renameElementAtCaret("lib2")
         assertEquals("<#import \"lib.ftl\" as lib>", myFixture.file.text)
     }
+
+    // 同名宏与变量不互相污染使用列表：宏 m 的使用只有 <@m/>，变量 m 的使用只有 ${m}。
+    fun testFindUsagesDisambiguatesMacroAndVariable() {
+        myFixture.configureByText("main.ftl", "<#macro m>a</#macro>\n<#assign m = 1>\n<@m/>\n\${m}")
+        val macro = PsiTreeUtil.findChildOfType(myFixture.file, FtlMacroDirective::class.java)
+        assertNotNull(macro)
+        assertEquals(1, myFixture.findUsages(macro!!.identifier).size)
+
+        val assign = PsiTreeUtil.findChildOfType(myFixture.file, FtlAssignDirective::class.java)
+        assertNotNull(assign)
+        assertEquals(1, myFixture.findUsages(assign!!.identifier).size)
+    }
 }

@@ -13,7 +13,7 @@ class FreemarkerLexer : LexerBase() {
     private var tokenEnd = 0
     private var tokenType: IElementType? = null
 
-    private enum class Mode { DATA, INTERPOLATION, TAG }
+    private enum class Mode { DATA, INTERPOLATION, TAG, STYLE, SCRIPT }
 
     private var mode = Mode.DATA
     private var expectName = false
@@ -53,11 +53,15 @@ class FreemarkerLexer : LexerBase() {
             Mode.DATA -> advanceData()
             Mode.INTERPOLATION -> advanceInterpolation()
             Mode.TAG -> advanceTag()
+            Mode.STYLE -> advanceEmbeddedContent("style", FreemarkerTokenTypes.STYLE_DATA)
+            Mode.SCRIPT -> advanceEmbeddedContent("script", FreemarkerTokenTypes.SCRIPT_DATA)
         }
     }
 
     private fun advanceData() {
         when {
+            startsWithIgnoreCase(pos, "<style") -> lexEmbeddedTagStart(Mode.STYLE)
+            startsWithIgnoreCase(pos, "<script") -> lexEmbeddedTagStart(Mode.SCRIPT)
             startsWith(pos, "<#--") -> {
                 tokenType = FreemarkerTokenTypes.COMMENT
                 val end = indexOf(pos, "-->")
@@ -103,10 +107,57 @@ class FreemarkerLexer : LexerBase() {
                 continue
             }
             if (isFreemarkerStart(pos)) break
+            if (startsWithIgnoreCase(pos, "<style") || startsWithIgnoreCase(pos, "<script")) break
             pos++
         }
         tokenType = FreemarkerTokenTypes.TEMPLATE_DATA
         tokenEnd = pos
+    }
+
+    private fun lexEmbeddedTagStart(contentMode: Mode) {
+        val gt = indexOf(pos, ">")
+        if (gt >= 0) {
+            val selfClosing = gt > pos && buffer[gt - 1] == '/'
+            pos = gt + 1
+            tokenType = FreemarkerTokenTypes.TEMPLATE_DATA
+            tokenEnd = pos
+            mode = if (selfClosing) Mode.DATA else contentMode
+        } else {
+            pos = endOffset
+            tokenType = FreemarkerTokenTypes.TEMPLATE_DATA
+            tokenEnd = pos
+        }
+    }
+
+    private fun advanceEmbeddedContent(tagName: String, dataType: IElementType) {
+        val close = indexOfIgnoreCase(pos, "</$tagName")
+        if (close >= 0) {
+            tokenType = dataType
+            tokenEnd = close
+            pos = close
+        } else {
+            tokenType = dataType
+            tokenEnd = endOffset
+            pos = endOffset
+        }
+        mode = Mode.DATA
+    }
+
+    private fun startsWithIgnoreCase(offset: Int, text: String): Boolean {
+        if (offset + text.length > endOffset) return false
+        for (i in text.indices) {
+            if (buffer[offset + i].lowercaseChar() != text[i].lowercaseChar()) return false
+        }
+        return true
+    }
+
+    private fun indexOfIgnoreCase(from: Int, text: String): Int {
+        var i = from
+        while (i <= endOffset - text.length) {
+            if (startsWithIgnoreCase(i, text)) return i
+            i++
+        }
+        return -1
     }
 
     private fun advanceInterpolation() {

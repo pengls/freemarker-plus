@@ -18,4 +18,6 @@ object FreemarkerTokenTypes {
     @JvmField val OPERATOR = FreemarkerTokenType("OPERATOR")
     @JvmField val BAD_CHARACTER = FreemarkerTokenType("BAD_CHARACTER")
     @JvmField val TEMPLATE_DATA = FreemarkerTokenType("TEMPLATE_DATA")
+    @JvmField val STYLE_DATA = FreemarkerTokenType("STYLE_DATA")
+    @JvmField val SCRIPT_DATA = FreemarkerTokenType("SCRIPT_DATA")
 }

@@ -86,4 +86,28 @@ class FreemarkerLexerTest : BasePlatformTestCase() {
         val text = "<div class=\"a\">text</div>"
         assertEquals(listOf(FreemarkerTokenTypes.TEMPLATE_DATA), types(text))
     }
+
+    fun testStyleBlockContentIsStyleData() {
+        val text = "<style>.a { color: red; }</style>"
+        assertEquals(
+            listOf(
+                FreemarkerTokenTypes.TEMPLATE_DATA,   // <style>
+                FreemarkerTokenTypes.STYLE_DATA,          // .a { color: red; }
+                FreemarkerTokenTypes.TEMPLATE_DATA    // </style>
+            ),
+            types(text)
+        )
+    }
+
+    fun testScriptBlockContentIsScriptData() {
+        val text = "<script>var x = 1;</script>"
+        assertEquals(
+            listOf(
+                FreemarkerTokenTypes.TEMPLATE_DATA,   // <script>
+                FreemarkerTokenTypes.SCRIPT_DATA,         // var x = 1;
+                FreemarkerTokenTypes.TEMPLATE_DATA    // </script>
+            ),
+            types(text)
+        )
+    }
 }

@@ -110,4 +110,47 @@ class FreemarkerLexerTest : BasePlatformTestCase() {
             types(text)
         )
     }
+
+    fun testEmptyScriptTagHasNoZeroLengthToken() {
+        val text = "<script src=\"x.js\"></script>"
+        assertEquals(
+            listOf(FreemarkerTokenTypes.TEMPLATE_DATA, FreemarkerTokenTypes.TEMPLATE_DATA),
+            types(text)
+        )
+    }
+
+    fun testEmptyStyleTagHasNoZeroLengthToken() {
+        val text = "<style></style>"
+        assertEquals(
+            listOf(FreemarkerTokenTypes.TEMPLATE_DATA, FreemarkerTokenTypes.TEMPLATE_DATA),
+            types(text)
+        )
+    }
+
+    fun testClosingMacroRecognized() {
+        val text = "</@base.layout>"
+        assertEquals(
+            listOf(
+                FreemarkerTokenTypes.INTERPOLATION,
+                FreemarkerTokenTypes.DIRECTIVE_NAME,
+                FreemarkerTokenTypes.OPERATOR,
+                FreemarkerTokenTypes.IDENTIFIER,
+                FreemarkerTokenTypes.INTERPOLATION
+            ),
+            types(text)
+        )
+    }
+
+    fun testClosingDirectiveAfterDataRecognized() {
+        val text = "text</#if>"
+        assertEquals(
+            listOf(
+                FreemarkerTokenTypes.TEMPLATE_DATA,
+                FreemarkerTokenTypes.INTERPOLATION,
+                FreemarkerTokenTypes.DIRECTIVE_NAME,
+                FreemarkerTokenTypes.INTERPOLATION
+            ),
+            types(text)
+        )
+    }
 }

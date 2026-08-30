@@ -75,6 +75,13 @@ class FreemarkerLexer : LexerBase() {
                 mode = Mode.TAG
                 expectName = true
             }
+            startsWith(pos, "</@") -> {
+                tokenType = FreemarkerTokenTypes.INTERPOLATION
+                pos += 3
+                tokenEnd = pos
+                mode = Mode.TAG
+                expectName = true
+            }
             startsWith(pos, "<#") -> {
                 tokenType = FreemarkerTokenTypes.INTERPOLATION
                 pos += 2
@@ -131,14 +138,21 @@ class FreemarkerLexer : LexerBase() {
 
     private fun advanceEmbeddedContent(tagName: String, dataType: IElementType) {
         val close = indexOfIgnoreCase(pos, "</$tagName")
-        if (close >= 0) {
-            tokenType = dataType
-            tokenEnd = close
-            pos = close
-        } else {
+        if (close < 0) {
             tokenType = dataType
             tokenEnd = endOffset
             pos = endOffset
+        } else if (close == pos) {
+            // Empty content (e.g. <script src="x.js"></script>): emit the closing
+            // tag as HTML data instead of a zero-length data token.
+            tokenType = FreemarkerTokenTypes.TEMPLATE_DATA
+            val gt = indexOf(close, ">")
+            pos = if (gt >= 0) gt + 1 else endOffset
+            tokenEnd = pos
+        } else {
+            tokenType = dataType
+            tokenEnd = close
+            pos = close
         }
         mode = Mode.DATA
     }
@@ -256,7 +270,8 @@ class FreemarkerLexer : LexerBase() {
     }
 
     private fun isFreemarkerStart(offset: Int): Boolean =
-        startsWith(offset, "\${") || startsWith(offset, "<#") || startsWith(offset, "<@")
+        startsWith(offset, "\${") || startsWith(offset, "<#") || startsWith(offset, "<@") ||
+        startsWith(offset, "</#") || startsWith(offset, "</@")
 
     private fun startsWith(offset: Int, text: String): Boolean {
         if (offset + text.length > endOffset) return false

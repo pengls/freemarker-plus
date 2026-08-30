@@ -7,21 +7,21 @@ import com.intellij.psi.tree.IElementType
 
 object FreemarkerColors {
     @JvmField val COMMENT = TextAttributesKey.createTextAttributesKey(
-        "FREEMARKER_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
+        "FREEMARKER_PLUS_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
     @JvmField val STRING = TextAttributesKey.createTextAttributesKey(
-        "FREEMARKER_STRING", DefaultLanguageHighlighterColors.STRING)
+        "FREEMARKER_PLUS_STRING", DefaultLanguageHighlighterColors.STRING)
     @JvmField val KEYWORD = TextAttributesKey.createTextAttributesKey(
-        "FREEMARKER_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
+        "FREEMARKER_PLUS_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
     @JvmField val DIRECTIVE_NAME = TextAttributesKey.createTextAttributesKey(
-        "FREEMARKER_DIRECTIVE_NAME", DefaultLanguageHighlighterColors.FUNCTION_DECLARATION)
+        "FREEMARKER_PLUS_DIRECTIVE_NAME", DefaultLanguageHighlighterColors.FUNCTION_DECLARATION)
     @JvmField val INTERPOLATION = TextAttributesKey.createTextAttributesKey(
-        "FREEMARKER_INTERPOLATION", DefaultLanguageHighlighterColors.BRACES)
+        "FREEMARKER_PLUS_INTERPOLATION", DefaultLanguageHighlighterColors.BRACES)
     @JvmField val NUMBER = TextAttributesKey.createTextAttributesKey(
-        "FREEMARKER_NUMBER", DefaultLanguageHighlighterColors.NUMBER)
+        "FREEMARKER_PLUS_NUMBER", DefaultLanguageHighlighterColors.NUMBER)
     @JvmField val OPERATOR = TextAttributesKey.createTextAttributesKey(
-        "FREEMARKER_OPERATOR", DefaultLanguageHighlighterColors.OPERATION_SIGN)
+        "FREEMARKER_PLUS_OPERATOR", DefaultLanguageHighlighterColors.OPERATION_SIGN)
     @JvmField val BAD_CHARACTER = TextAttributesKey.createTextAttributesKey(
-        "FREEMARKER_BAD_CHARACTER", DefaultLanguageHighlighterColors.INVALID_STRING_ESCAPE)
+        "FREEMARKER_PLUS_BAD_CHARACTER", DefaultLanguageHighlighterColors.INVALID_STRING_ESCAPE)
 
     fun keyFor(tokenType: IElementType): TextAttributesKey? = when (tokenType) {
         FreemarkerTokenTypes.COMMENT -> COMMENT

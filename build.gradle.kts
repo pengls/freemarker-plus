@@ -24,6 +24,13 @@ dependencies {
     intellijPlatform {
         intellijIdea("2026.2")
         testFramework(TestFrameworkType.Platform)
+        // Workaround for 2026.2 EAP test-mode module resolution (YouTrack IJPL-248701):
+        // without the "misc" libraries plugin, `intellij.libraries.lucene.common` is
+        // unresolvable in tests, which cascades into excluding our plugin (and thus its
+        // `lang.parserDefinition`/`lang.fileViewProviderFactory` extensions) so
+        // PsiFileFactory.createFileFromText returns null. Test-only; does not affect
+        // the production plugin.
+        testBundledPlugin("intellij.libraries.misc.plugin")
     }
 
     testImplementation("junit:junit:4.13.2")

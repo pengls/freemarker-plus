@@ -22,18 +22,34 @@ import static com.freemarkerplus.psi.FtlElementTypes.*;
 %type IElementType
 %unicode
 
-EOL=\R
+%state TAG
+%state INTERPOLATION
+%state COMMENT
+
 WHITE_SPACE=\s+
 
 IDENT=[a-zA-Z_][a-zA-Z0-9_]*
 STRING='([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\"
 NUMBER=[0-9]+(\.[0-9]+)?
-TEMPLATE_DATA=([^<]|<[^#@/])+
+TEMPLATE_DATA=([^<#$]|<[^#@/])+
 
 %%
-<YYINITIAL> {
-  {WHITE_SPACE}           { return WHITE_SPACE; }
 
+// Template data: runs of data text (HTML/CSS/JS) that stop at FTL delimiters.
+<YYINITIAL> {
+  "<#--"                  { yybegin(COMMENT); return COMMENT_START; }
+  "<#"                    { yybegin(TAG); return OPEN_TAG; }
+  "</#"                   { yybegin(TAG); return CLOSE_TAG; }
+  "<@"                    { yybegin(TAG); return OPEN_MACRO; }
+  "</@"                   { yybegin(TAG); return CLOSE_MACRO; }
+  "${"                    { yybegin(INTERPOLATION); return OPEN_INTERPOLATION; }
+  "#{"                    { yybegin(INTERPOLATION); return OPEN_LEGACY; }
+  {TEMPLATE_DATA}         { return TEMPLATE_DATA; }
+}
+
+// Inside <#...> / </#...> / <@...> / </@...>
+<TAG> {
+  {WHITE_SPACE}           { return WHITE_SPACE; }
   "include"               { return INCLUDE; }
   "import"                { return IMPORT; }
   "assign"                { return ASSIGN; }
@@ -50,26 +66,35 @@ TEMPLATE_DATA=([^<]|<[^#@/])+
   "default"               { return DEFAULT; }
   "break"                 { return BREAK; }
   "as"                    { return AS; }
-  "<#"                    { return OPEN_TAG; }
-  "</#"                   { return CLOSE_TAG; }
-  "<@"                    { return OPEN_MACRO; }
-  "</@"                   { return CLOSE_MACRO; }
-  "${"                    { return OPEN_INTERPOLATION; }
-  "#{"                    { return OPEN_LEGACY; }
-  "}"                     { return CLOSE_BRACE; }
-  ">"                     { return TAG_END; }
-  "<#--"                  { return COMMENT_START; }
-  "-->"                   { return COMMENT_END; }
+  ">"                     { yybegin(YYINITIAL); return TAG_END; }
   "."                     { return DOT; }
   ","                     { return COMMA; }
   "="                     { return ASSIGN_OP; }
   "("                     { return LPAREN; }
   ")"                     { return RPAREN; }
-
   {IDENT}                 { return IDENT; }
   {STRING}                { return STRING; }
   {NUMBER}                { return NUMBER; }
-  {TEMPLATE_DATA}         { return TEMPLATE_DATA; }
+}
+
+// Inside ${...} / #{...}
+<INTERPOLATION> {
+  {WHITE_SPACE}           { return WHITE_SPACE; }
+  "}"                     { yybegin(YYINITIAL); return CLOSE_BRACE; }
+  "."                     { return DOT; }
+  ","                     { return COMMA; }
+  "="                     { return ASSIGN_OP; }
+  "("                     { return LPAREN; }
+  ")"                     { return RPAREN; }
+  {IDENT}                 { return IDENT; }
+  {STRING}                { return STRING; }
+  {NUMBER}                { return NUMBER; }
+}
+
+// Inside <#-- ... --> (content is skipped, not tokenized)
+<COMMENT> {
+  "-->"                   { yybegin(YYINITIAL); return COMMENT_END; }
+  [^]                     { /* skip */ }
 }
 
 [^] { return BAD_CHARACTER; }

@@ -19,5 +19,6 @@
                   extensions="ftl"/>
         <lang.syntaxHighlighterFactory language="FTL"
                                        implementationClass="com.freemarkerplus.highlighting.FreemarkerSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="com.freemarkerplus.highlighting.FreemarkerColorSettingsPage"/>
     </extensions>
 </idea-plugin>

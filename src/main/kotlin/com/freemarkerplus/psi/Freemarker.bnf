@@ -1,0 +1,68 @@
+{
+  generate=[psi="yes" tokens="yes"]
+  parserClass="com.freemarkerplus.psi.FtlParser"
+  parserUtilClass="com.freemarkerplus.psi.FtlParserUtil"
+  psiClassPrefix="Ftl"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.freemarkerplus.psi"
+  psiImplPackage="com.freemarkerplus.psi.impl"
+  elementTypeHolderClass="com.freemarkerplus.psi.FtlElementTypes"
+  elementTypeClass="com.freemarkerplus.psi.FtlElementType"
+  tokenTypeClass="com.freemarkerplus.psi.FtlTokenType"
+  tokens=[
+    INCLUDE="include" IMPORT="import" ASSIGN="assign" LOCAL="local" GLOBAL="global"
+    MACRO="macro" FUNCTION="function" LIST="list" IF="if" ELSEIF="elseif" ELSE="else"
+    SWITCH="switch" CASE="case" DEFAULT="default" BREAK="break" AS="as"
+    OPEN_TAG="<#" CLOSE_TAG="</#" OPEN_MACRO="<@" CLOSE_MACRO="</@"
+    OPEN_INTERPOLATION="${" OPEN_LEGACY="#{" CLOSE_BRACE="}"
+    TAG_END=">" COMMENT_START="<#--" COMMENT_END="-->"
+    DOT="." COMMA="," ASSIGN_OP="=" LPAREN="(" RPAREN=")"
+    IDENT="regexp:[a-zA-Z_][a-zA-Z0-9_]*"
+    STRING="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\")"
+    NUMBER="regexp:[0-9]+(\.[0-9]+)?"
+    TEMPLATE_DATA="regexp:([^<]|<(?![#@/]))+"
+  ]
+}
+
+ftlFile          ::= outer_element*
+outer_element    ::= COMMENT | include_directive | import_directive | assign_directive
+                   | macro_directive | function_directive | list_directive
+                   | macro_call | interpolation | generic_directive | TEMPLATE_DATA
+
+COMMENT          ::= COMMENT_START COMMENT_END
+
+// <#include "a.ftl">
+include_directive ::= OPEN_TAG INCLUDE string_literal TAG_END
+// <#import "a.ftl" as ns>
+import_directive  ::= OPEN_TAG IMPORT string_literal AS identifier TAG_END
+// <#assign name = expr> / <#local ...> / <#global ...>
+assign_directive  ::= OPEN_TAG (ASSIGN | LOCAL | GLOBAL) identifier ASSIGN_OP expression TAG_END
+// <#macro name ...>
+macro_directive   ::= OPEN_TAG MACRO identifier attribute* TAG_END
+// <#function name ...>
+function_directive::= OPEN_TAG FUNCTION identifier attribute* TAG_END
+// <#list expr as name>
+list_directive    ::= OPEN_TAG LIST expression AS identifier TAG_END
+
+// <@name .../> 与 </@name>
+macro_call        ::= OPEN_MACRO identifier attribute* TAG_END
+                   | CLOSE_MACRO identifier TAG_END
+
+// 其余指令（if/elseif/else/switch/case/default/break/自定义指令）走通用规则
+generic_directive ::= OPEN_TAG directive_name attribute* TAG_END
+                    | CLOSE_TAG directive_name TAG_END
+directive_name    ::= IF | ELSEIF | ELSE | SWITCH | CASE | DEFAULT | BREAK | IDENT
+
+interpolation     ::= OPEN_INTERPOLATION expression CLOSE_BRACE
+                    | OPEN_LEGACY expression CLOSE_BRACE
+
+expression        ::= primary (DOT primary)*
+primary           ::= identifier
+                    | string_literal
+                    | NUMBER
+                    | LPAREN expression RPAREN
+attribute         ::= identifier ASSIGN_OP expression
+                    | expression
+
+identifier        ::= IDENT
+string_literal    ::= STRING

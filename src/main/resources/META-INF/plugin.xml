@@ -3,7 +3,8 @@
     <name>Freemarker Plus</name>
     <vendor>pengl</vendor>
     <description><![CDATA[
-        Syntax highlighting for FreeMarker templates (.ftl, .ftlh, .ftlx) with HTML/CSS/JS support.
+        Syntax highlighting for FreeMarker templates (.ftl, .ftlh, .ftlx) with HTML/CSS/JS support,
+        plus code navigation: go to declaration, find usages, structure view, folding, breadcrumbs, and rename.
     ]]></description>
 
     <idea-version since-build="262" until-build="262.*"/>

@@ -1,6 +1,6 @@
 # Freemarker Plus
 
-An IntelliJ IDEA plugin that provides rich syntax highlighting for FreeMarker template files (`.ftl`, `.ftlh`, `.ftlx`), with embedded CSS and JavaScript support.
+An IntelliJ IDEA plugin that provides rich syntax highlighting and code navigation for FreeMarker template files (`.ftl`, `.ftlh`, `.ftlx`), with embedded CSS and JavaScript support.
 
 ## Features
 
@@ -9,6 +9,14 @@ An IntelliJ IDEA plugin that provides rich syntax highlighting for FreeMarker te
 - **Embedded CSS highlighting** — CSS code inside `<style>` blocks is highlighted with the platform CSS lexer.
 - **Embedded JavaScript highlighting** — JavaScript code inside `<script>` blocks is highlighted with the platform JS lexer.
 - **Color scheme customization** — all FreeMarker token colors are configurable at **Settings → Editor → Color Scheme → Freemarker**.
+
+## Code Navigation (Phase 2)
+
+- **Go to declaration** (Ctrl+B) — `#include`/`#import` file paths, `<@macro>` calls, `${variable}` references, `ns.member` namespaces.
+- **Find usages** (Alt+F7) — macros, functions, variables.
+- **Structure view** (Alt+7) — directives, macros, includes.
+- **Code folding** — `<#if>/<#list>/<#macro>/<#function>/<#switch>` blocks.
+- **Breadcrumbs** and **rename** (Shift+F6).
 
 ## Supported File Types
 
@@ -39,7 +47,7 @@ Colors follow your active color scheme and are anchored to standard IntelliJ lan
 
 ### From ZIP (Manual)
 
-1. Download the `freemarker-plus-0.1.0.zip` from the releases.
+1. Download the `freemarker-plus-0.2.0.zip` from the releases.
 2. In IntelliJ IDEA, go to **Settings → Plugins → ⚙ → Install Plugin from Disk...**
 3. Select the downloaded ZIP file and restart the IDE.
 
@@ -50,7 +58,7 @@ Colors follow your active color scheme and are anchored to standard IntelliJ lan
 ./gradlew buildPlugin
 
 # The distributable is at:
-# build/distributions/freemarker-plus-0.1.0.zip
+# build/distributions/freemarker-plus-0.2.0.zip
 ```
 
 To install from the built ZIP, follow the "From ZIP" instructions above.
@@ -59,7 +67,7 @@ To install from the built ZIP, follow the "From ZIP" instructions above.
 
 ### Prerequisites
 
-- JDK 21
+- JDK 25 (the IntelliJ 2026.2 bundled JBR, or any JDK 25; `jvmToolchain(25)` resolves it via `org.gradle.java.installations.paths`)
 - Gradle 9.7.1 (bundled wrapper or local install)
 
 ### Build & Test
@@ -124,7 +132,7 @@ Open `examples/demo.ftl` in the sandbox IDE to see all highlighting features in 
 | Kotlin           | 2.3.0   |
 | IPGP             | 2.16.0  |
 | Gradle           | 9.7.1   |
-| JDK              | 21      |
+| JDK              | 25      |
 
 ## License
 

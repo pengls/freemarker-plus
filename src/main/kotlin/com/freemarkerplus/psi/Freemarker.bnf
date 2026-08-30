@@ -51,7 +51,8 @@ macro_call        ::= OPEN_MACRO identifier attribute* SLASH? TAG_END
 // 其余指令（if/elseif/else/switch/case/default/break/自定义指令）走通用规则
 generic_directive ::= OPEN_TAG directive_name attribute* TAG_END
                     | CLOSE_TAG directive_name TAG_END
-directive_name    ::= IF | ELSEIF | ELSE | SWITCH | CASE | DEFAULT | BREAK | MACRO | FUNCTION | IDENT
+directive_name    ::= IF | ELSEIF | ELSE | SWITCH | CASE | DEFAULT | BREAK | MACRO | FUNCTION
+                    | LIST | ASSIGN | LOCAL | GLOBAL | IMPORT | INCLUDE | IDENT
 
 interpolation     ::= OPEN_INTERPOLATION expression CLOSE_BRACE
                     | OPEN_LEGACY expression CLOSE_BRACE

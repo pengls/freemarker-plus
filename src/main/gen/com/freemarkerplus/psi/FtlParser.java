@@ -100,7 +100,8 @@ public class FtlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // IF | ELSEIF | ELSE | SWITCH | CASE | DEFAULT | BREAK | MACRO | FUNCTION | IDENT
+  // IF | ELSEIF | ELSE | SWITCH | CASE | DEFAULT | BREAK | MACRO | FUNCTION
+  //                     | LIST | ASSIGN | LOCAL | GLOBAL | IMPORT | INCLUDE | IDENT
   public static boolean directive_name(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "directive_name")) return false;
     boolean result_;
@@ -114,6 +115,12 @@ public class FtlParser implements PsiParser, LightPsiParser {
     if (!result_) result_ = consumeToken(builder_, BREAK);
     if (!result_) result_ = consumeToken(builder_, MACRO);
     if (!result_) result_ = consumeToken(builder_, FUNCTION);
+    if (!result_) result_ = consumeToken(builder_, LIST);
+    if (!result_) result_ = consumeToken(builder_, ASSIGN);
+    if (!result_) result_ = consumeToken(builder_, LOCAL);
+    if (!result_) result_ = consumeToken(builder_, GLOBAL);
+    if (!result_) result_ = consumeToken(builder_, IMPORT);
+    if (!result_) result_ = consumeToken(builder_, INCLUDE);
     if (!result_) result_ = consumeToken(builder_, IDENT);
     exit_section_(builder_, level_, marker_, result_, false, null);
     return result_;

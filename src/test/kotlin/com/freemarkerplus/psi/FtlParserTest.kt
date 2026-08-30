@@ -87,4 +87,16 @@ class FtlParserTest : BasePlatformTestCase() {
         assertFalse("expected no error elements", PsiTreeUtil.hasErrorElements(file))
         assertTrue(leaves(file).none { it.node?.elementType == TokenType.BAD_CHARACTER })
     }
+
+    fun testDirectiveCloseTagsParseAsGenericDirective() {
+        val file = parse("<#list items as item>\n</#list>\n<#assign x = 1>\n</#assign>")
+        assertNotNull(PsiTreeUtil.findChildOfType(file, FtlListDirective::class.java))
+        assertNotNull(PsiTreeUtil.findChildOfType(file, FtlAssignDirective::class.java))
+        assertFalse("expected no error elements", PsiTreeUtil.hasErrorElements(file))
+        assertTrue(leaves(file).none { it.node?.elementType == TokenType.BAD_CHARACTER })
+        // 闭合标签走 generic_directive
+        val generic = PsiTreeUtil.findChildrenOfType(file, FtlGenericDirective::class.java)
+        assertTrue(generic.any { it.text == "</#list>" })
+        assertTrue(generic.any { it.text == "</#assign>" })
+    }
 }

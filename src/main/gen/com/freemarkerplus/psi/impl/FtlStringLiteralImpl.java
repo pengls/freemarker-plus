@@ -8,12 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.freemarkerplus.psi.FtlElementTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.freemarkerplus.psi.*;
 
-public class FtlStringLiteralImpl extends ASTWrapperPsiElement implements FtlStringLiteral {
+public class FtlStringLiteralImpl extends FtlStringLiteralMixin implements FtlStringLiteral {
 
-  public FtlStringLiteralImpl(@NotNull ASTNode node) {
+  public FtlStringLiteralImpl(ASTNode node) {
     super(node);
   }
 

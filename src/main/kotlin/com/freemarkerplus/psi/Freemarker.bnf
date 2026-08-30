@@ -65,4 +65,8 @@ attribute         ::= identifier ASSIGN_OP expression
                     | expression
 
 identifier        ::= IDENT
-string_literal    ::= STRING
+string_literal    ::= STRING {
+  // Mix in ContributedReferenceHost so psi.referenceContributor providers
+  // (FtlReferenceContributor) are consulted for string literals.
+  mixin="com.freemarkerplus.psi.impl.FtlStringLiteralMixin"
+}

@@ -24,5 +24,9 @@
         <lang.syntaxHighlighterFactory language="FTL"
                                        implementationClass="com.freemarkerplus.highlighting.FreemarkerSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="com.freemarkerplus.highlighting.FreemarkerColorSettingsPage"/>
+        <psi.referenceContributor language="FTL"
+                                  implementation="com.freemarkerplus.reference.FtlReferenceContributor"/>
+        <lang.elementManipulator forClass="com.freemarkerplus.psi.FtlStringLiteral"
+                                 implementationClass="com.freemarkerplus.reference.FtlStringManipulator"/>
     </extensions>
 </idea-plugin>

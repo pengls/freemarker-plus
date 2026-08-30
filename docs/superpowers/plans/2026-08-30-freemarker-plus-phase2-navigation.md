@@ -530,9 +530,9 @@ class FtlFileReference(element: FtlStringLiteral, rangeInElement: TextRange) :
         FileReferenceSet(myElement.containingFile, myElement, rangeInElement.startOffset, this, true, true, null)
     }
 
-    override fun resolve(): PsiElement? = delegate.allReferences.firstOrNull()?.resolve()
+    override fun resolve(): PsiElement? = delegate.allReferences.lastOrNull()?.resolve()
 
-    override fun getVariants(): Array<Any> = delegate.allReferences.firstOrNull()?.variants ?: emptyArray()
+    override fun getVariants(): Array<Any> = delegate.allReferences.lastOrNull()?.variants ?: emptyArray()
 }
 ```
 

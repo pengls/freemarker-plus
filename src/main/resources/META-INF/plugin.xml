@@ -29,5 +29,10 @@
         <lang.elementManipulator forClass="com.freemarkerplus.psi.FtlStringLiteral"
                                  implementationClass="com.freemarkerplus.reference.FtlStringManipulator"/>
         <fileBasedIndex implementation="com.freemarkerplus.reference.FtlFileIndex"/>
+        <lang.findUsagesProvider language="FTL"
+                                 implementationClass="com.freemarkerplus.navigation.FtlFindUsagesProvider"/>
+        <findUsagesHandlerFactory implementation="com.freemarkerplus.navigation.FtlFindUsagesHandlerFactory"/>
+        <definitionsSearch implementation="com.freemarkerplus.navigation.FtlDefinitionSearcher"/>
+        <referencesSearch implementation="com.freemarkerplus.navigation.FtlMethodUsageSearcher"/>
     </extensions>
 </idea-plugin>

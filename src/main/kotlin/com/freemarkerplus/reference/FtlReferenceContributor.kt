@@ -1,9 +1,11 @@
 package com.freemarkerplus.reference
 
+import com.freemarkerplus.psi.FtlExpression
 import com.freemarkerplus.psi.FtlIdentifier
 import com.freemarkerplus.psi.FtlImportDirective
 import com.freemarkerplus.psi.FtlIncludeDirective
 import com.freemarkerplus.psi.FtlMacroCall
+import com.freemarkerplus.psi.FtlPrimary
 import com.freemarkerplus.psi.FtlStringLiteral
 import com.intellij.openapi.util.TextRange
 import com.intellij.patterns.PlatformPatterns
@@ -12,6 +14,7 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceContributor
 import com.intellij.psi.PsiReferenceProvider
 import com.intellij.psi.PsiReferenceRegistrar
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 
 class FtlReferenceContributor : PsiReferenceContributor() {
@@ -39,6 +42,27 @@ class FtlReferenceContributor : PsiReferenceContributor() {
                     // element 是 <@name 里的 name；</@name 的闭合名也指向同一宏，但只给打开标签附引用
                     return if (element.parent.text.startsWith("<@")) {
                         arrayOf(FtlMacroReference(element, TextRange(0, element.textLength)))
+                    } else {
+                        emptyArray()
+                    }
+                }
+            }
+        )
+
+        // 表达式内的首段标识符（${user}、<#if user> 的 user 等）→ 同文件变量声明。
+        // 只匹配 parent 为 FtlPrimary 的标识符，天然排除宏调用名（parent 为 FtlMacroCall）
+        // 与声明名（parent 为 assign/list/macro 指令）；根段过滤在 provider 内完成。
+        registrar.registerReferenceProvider(
+            PlatformPatterns.psiElement(FtlIdentifier::class.java)
+                .withParent(FtlPrimary::class.java),
+            object : PsiReferenceProvider() {
+                override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
+                    // 只对限定名根段挂引用（${user.name} → user）；属性段 name 属 Phase 3 Java 数据模型
+                    val expr = PsiTreeUtil.getParentOfType(element, FtlExpression::class.java)
+                        ?: return emptyArray()
+                    val rootPrimary = expr.firstChild
+                    return if (rootPrimary === element.parent) {
+                        arrayOf(FtlVariableReference(element, TextRange(0, element.textLength)))
                     } else {
                         emptyArray()
                     }

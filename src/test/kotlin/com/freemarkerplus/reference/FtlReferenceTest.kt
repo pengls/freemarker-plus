@@ -1,6 +1,8 @@
 package com.freemarkerplus.reference
 
+import com.freemarkerplus.psi.FtlAssignDirective
 import com.freemarkerplus.psi.FtlFunctionDirective
+import com.freemarkerplus.psi.FtlListDirective
 import com.freemarkerplus.psi.FtlMacroCall
 import com.freemarkerplus.psi.FtlMacroDirective
 import com.freemarkerplus.psi.FtlStringLiteral
@@ -86,5 +88,52 @@ class FtlReferenceTest : BasePlatformTestCase() {
         assertNotNull(target)
         assertEquals("hello", target!!.text)
         assertTrue(target.parent is FtlMacroDirective)
+    }
+
+    fun testVariableResolvesToAssign() {
+        myFixture.configureByText("main.ftl", "<#assign user = \"a\">\n\${user}")
+        // caret 移到 ${user} 的 user
+        myFixture.editor.caretModel.moveToOffset(myFixture.file.text.indexOf("user", myFixture.file.text.indexOf("\${")))
+        val ref = myFixture.file.findReferenceAt(myFixture.editor.caretModel.offset)
+        assertNotNull(ref)
+        val target = ref!!.resolve()
+        assertNotNull(target)
+        assertEquals("user", target!!.text)
+        assertTrue(target.parent is FtlAssignDirective)
+    }
+
+    fun testVariableResolvesToListLoopVar() {
+        myFixture.configureByText("main.ftl", "<#list items as item>\n\${item}")
+        myFixture.editor.caretModel.moveToOffset(myFixture.file.text.indexOf("item", myFixture.file.text.indexOf("\${")))
+        val ref = myFixture.file.findReferenceAt(myFixture.editor.caretModel.offset)
+        assertNotNull(ref)
+        val target = ref!!.resolve()
+        assertNotNull(target)
+        assertEquals("item", target!!.text)
+        assertTrue(target.parent is FtlListDirective)
+    }
+
+    fun testVariableResolvesInsideDirective() {
+        myFixture.configureByText("main.ftl", "<#assign user = \"a\">\n<#if user>")
+        myFixture.editor.caretModel.moveToOffset(myFixture.file.text.indexOf("user", myFixture.file.text.indexOf("<#if ")))
+        val ref = myFixture.file.findReferenceAt(myFixture.editor.caretModel.offset)
+        assertNotNull(ref)
+        val target = ref!!.resolve()
+        assertNotNull(target)
+        assertEquals("user", target!!.text)
+        assertTrue(target.parent is FtlAssignDirective)
+    }
+
+    fun testDottedExpressionOnlyRootSegmentResolves() {
+        myFixture.configureByText("main.ftl", "<#assign user = \"a\">\n\${user.name}")
+        // 根段 user → 解析到声明
+        myFixture.editor.caretModel.moveToOffset(myFixture.file.text.indexOf("user", myFixture.file.text.indexOf("\${")))
+        val rootRef = myFixture.file.findReferenceAt(myFixture.editor.caretModel.offset)
+        assertNotNull(rootRef)
+        assertEquals("user", rootRef!!.element.text)
+        assertNotNull(rootRef.resolve())
+        // 属性段 name 属 Phase 3 Java 数据模型，不应挂变量引用
+        myFixture.editor.caretModel.moveToOffset(myFixture.file.text.indexOf("name", myFixture.file.text.indexOf("\${")))
+        assertNull(myFixture.file.findReferenceAt(myFixture.editor.caretModel.offset))
     }
 }

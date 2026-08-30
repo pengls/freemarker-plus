@@ -18,4 +18,19 @@ object FtlPsiUtil {
         }
         return result
     }
+
+    // 收集指定名字的变量声明（assign/local/global 赋值名、list 的 as 循环变量）
+    fun findVariableDeclarations(file: FtlFile, name: String): List<PsiElement> {
+        val result = mutableListOf<PsiElement>()
+        PsiTreeUtil.processElements(file) { el ->
+            val ident = when (el) {
+                is FtlAssignDirective -> el.identifier  // assign/local/global 赋值名
+                is FtlListDirective -> el.identifier    // list 的 as 循环变量
+                else -> null
+            }
+            if (ident != null && ident.text == name) result.add(ident)
+            true
+        }
+        return result
+    }
 }

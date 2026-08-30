@@ -1,0 +1,13 @@
+<idea-plugin>
+    <id>com.freemarkerplus</id>
+    <name>Freemarker Plus</name>
+    <vendor>freemarker-plus</vendor>
+    <description><![CDATA[
+        Syntax highlighting for FreeMarker templates (.ftl) with HTML/CSS/JS support.
+    ]]></description>
+
+    <idea-version since-build="262" until-build="262.*"/>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+</idea-plugin>

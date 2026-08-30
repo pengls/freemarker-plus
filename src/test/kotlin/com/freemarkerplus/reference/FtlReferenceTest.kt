@@ -72,4 +72,19 @@ class FtlReferenceTest : BasePlatformTestCase() {
         assertEquals("hello", target!!.text)
         assertTrue(target.parent is FtlFunctionDirective)
     }
+
+    fun testSelfClosingMacroCallResolvesToDefinition() {
+        myFixture.configureByText("main.ftl", "<#macro hello>\n<@hello/>")
+        val call = PsiTreeUtil.findChildOfType(myFixture.file, FtlMacroCall::class.java)
+        assertNotNull(call)
+        val ident = call!!.identifier
+        myFixture.editor.caretModel.moveToOffset(ident.textOffset + 1)
+        val ref = myFixture.file.findReferenceAt(myFixture.editor.caretModel.offset)
+        assertNotNull(ref)
+        assertEquals("hello", ref!!.element.text)
+        val target = ref.resolve()
+        assertNotNull(target)
+        assertEquals("hello", target!!.text)
+        assertTrue(target.parent is FtlMacroDirective)
+    }
 }

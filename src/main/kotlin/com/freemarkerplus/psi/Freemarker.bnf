@@ -16,7 +16,7 @@
     OPEN_TAG="<#" CLOSE_TAG="</#" OPEN_MACRO="<@" CLOSE_MACRO="</@"
     OPEN_INTERPOLATION="${" OPEN_LEGACY="#{" CLOSE_BRACE="}"
     TAG_END=">" COMMENT_START="<#--" COMMENT_END="-->"
-    DOT="." COMMA="," ASSIGN_OP="=" LPAREN="(" RPAREN=")"
+    DOT="." COMMA="," ASSIGN_OP="=" LPAREN="(" RPAREN=")" SLASH="/"
     IDENT="regexp:[a-zA-Z_][a-zA-Z0-9_]*"
     STRING="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\")"
     NUMBER="regexp:[0-9]+(\.[0-9]+)?"
@@ -45,13 +45,13 @@ function_directive::= OPEN_TAG FUNCTION identifier attribute* TAG_END
 list_directive    ::= OPEN_TAG LIST expression AS identifier TAG_END
 
 // <@name .../> 与 </@name>
-macro_call        ::= OPEN_MACRO identifier attribute* TAG_END
+macro_call        ::= OPEN_MACRO identifier attribute* SLASH? TAG_END
                    | CLOSE_MACRO identifier TAG_END
 
 // 其余指令（if/elseif/else/switch/case/default/break/自定义指令）走通用规则
 generic_directive ::= OPEN_TAG directive_name attribute* TAG_END
                     | CLOSE_TAG directive_name TAG_END
-directive_name    ::= IF | ELSEIF | ELSE | SWITCH | CASE | DEFAULT | BREAK | IDENT
+directive_name    ::= IF | ELSEIF | ELSE | SWITCH | CASE | DEFAULT | BREAK | MACRO | FUNCTION | IDENT
 
 interpolation     ::= OPEN_INTERPOLATION expression CLOSE_BRACE
                     | OPEN_LEGACY expression CLOSE_BRACE

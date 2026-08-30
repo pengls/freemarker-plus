@@ -57,6 +57,7 @@ public interface FtlElementTypes {
   IElementType OPEN_MACRO = new FtlTokenType("<@");
   IElementType OPEN_TAG = new FtlTokenType("<#");
   IElementType RPAREN = new FtlTokenType(")");
+  IElementType SLASH = new FtlTokenType("/");
   IElementType STRING = new FtlTokenType("STRING");
   IElementType SWITCH = new FtlTokenType("switch");
   IElementType TAG_END = new FtlTokenType(">");

@@ -66,4 +66,25 @@ class FtlParserTest : BasePlatformTestCase() {
         assertNotNull(PsiTreeUtil.findChildOfType(file, FtlInterpolation::class.java))
         assertNotNull(PsiTreeUtil.findChildOfType(file, FtlGenericDirective::class.java))
     }
+
+    fun testSelfClosingMacroCallParsed() {
+        val file = parse("<@hello/>")
+        assertNotNull(PsiTreeUtil.findChildOfType(file, FtlMacroCall::class.java))
+        assertFalse("expected no error elements", PsiTreeUtil.hasErrorElements(file))
+        assertTrue(leaves(file).none { it.node?.elementType == TokenType.BAD_CHARACTER })
+    }
+
+    fun testMacroCloseTagParsed() {
+        val file = parse("<#macro hello>hi</#macro>")
+        assertNotNull(PsiTreeUtil.findChildOfType(file, FtlMacroDirective::class.java))
+        assertFalse("expected no error elements", PsiTreeUtil.hasErrorElements(file))
+        assertTrue(leaves(file).none { it.node?.elementType == TokenType.BAD_CHARACTER })
+    }
+
+    fun testFunctionCloseTagParsed() {
+        val file = parse("<#function hello>hi</#function>")
+        assertNotNull(PsiTreeUtil.findChildOfType(file, FtlFunctionDirective::class.java))
+        assertFalse("expected no error elements", PsiTreeUtil.hasErrorElements(file))
+        assertTrue(leaves(file).none { it.node?.elementType == TokenType.BAD_CHARACTER })
+    }
 }

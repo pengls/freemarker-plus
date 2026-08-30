@@ -72,6 +72,7 @@ TEMPLATE_DATA=([^<#$]|\$[^{]|\#[^{]|<[^#@/]|<\/[^#@])+
   "="                     { return ASSIGN_OP; }
   "("                     { return LPAREN; }
   ")"                     { return RPAREN; }
+  "/"                     { return SLASH; }
   {IDENT}                 { return IDENT; }
   {STRING}                { return STRING; }
   {NUMBER}                { return NUMBER; }

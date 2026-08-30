@@ -100,7 +100,7 @@ public class FtlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // IF | ELSEIF | ELSE | SWITCH | CASE | DEFAULT | BREAK | IDENT
+  // IF | ELSEIF | ELSE | SWITCH | CASE | DEFAULT | BREAK | MACRO | FUNCTION | IDENT
   public static boolean directive_name(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "directive_name")) return false;
     boolean result_;
@@ -112,6 +112,8 @@ public class FtlParser implements PsiParser, LightPsiParser {
     if (!result_) result_ = consumeToken(builder_, CASE);
     if (!result_) result_ = consumeToken(builder_, DEFAULT);
     if (!result_) result_ = consumeToken(builder_, BREAK);
+    if (!result_) result_ = consumeToken(builder_, MACRO);
+    if (!result_) result_ = consumeToken(builder_, FUNCTION);
     if (!result_) result_ = consumeToken(builder_, IDENT);
     exit_section_(builder_, level_, marker_, result_, false, null);
     return result_;
@@ -336,7 +338,7 @@ public class FtlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // OPEN_MACRO identifier attribute* TAG_END
+  // OPEN_MACRO identifier attribute* SLASH? TAG_END
   //                    | CLOSE_MACRO identifier TAG_END
   public static boolean macro_call(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "macro_call")) return false;
@@ -349,7 +351,7 @@ public class FtlParser implements PsiParser, LightPsiParser {
     return result_;
   }
 
-  // OPEN_MACRO identifier attribute* TAG_END
+  // OPEN_MACRO identifier attribute* SLASH? TAG_END
   private static boolean macro_call_0(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "macro_call_0")) return false;
     boolean result_;
@@ -357,6 +359,7 @@ public class FtlParser implements PsiParser, LightPsiParser {
     result_ = consumeToken(builder_, OPEN_MACRO);
     result_ = result_ && identifier(builder_, level_ + 1);
     result_ = result_ && macro_call_0_2(builder_, level_ + 1);
+    result_ = result_ && macro_call_0_3(builder_, level_ + 1);
     result_ = result_ && consumeToken(builder_, TAG_END);
     exit_section_(builder_, marker_, null, result_);
     return result_;
@@ -370,6 +373,13 @@ public class FtlParser implements PsiParser, LightPsiParser {
       if (!attribute(builder_, level_ + 1)) break;
       if (!empty_element_parsed_guard_(builder_, "macro_call_0_2", pos_)) break;
     }
+    return true;
+  }
+
+  // SLASH?
+  private static boolean macro_call_0_3(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "macro_call_0_3")) return false;
+    consumeToken(builder_, SLASH);
     return true;
   }
 

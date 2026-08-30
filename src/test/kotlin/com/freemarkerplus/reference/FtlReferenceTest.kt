@@ -160,6 +160,21 @@ class FtlReferenceTest : BasePlatformTestCase() {
         assertEquals(lib.virtualFile, target.containingFile.virtualFile)
     }
 
+    fun testNamespaceResolvesViaFindReferenceAt() {
+        val lib = myFixture.addFileToProject("lib.ftl", "<#macro hello>hi</#macro>")
+        myFixture.configureByText("main.ftl", "<#import \"lib.ftl\" as lib>\n\${lib.hello}")
+        // caret 到根段 lib，走 Ctrl+B 的真实入口 findReferenceAt；findReferenceAt 会返回一个
+        // 包裹根段所有引用的 PsiMultiReference，其 resolve() 取第一个匹配（命名空间引用在前）。
+        myFixture.editor.caretModel.moveToOffset(myFixture.file.text.indexOf("lib.hello") + 1)
+        val ref = myFixture.file.findReferenceAt(myFixture.editor.caretModel.offset)
+        assertNotNull(ref)
+        val target = ref!!.resolve()
+        assertNotNull(target)
+        assertEquals("hello", target!!.text)
+        assertTrue(target.parent is FtlMacroDirective)
+        assertEquals(lib.virtualFile, target.containingFile.virtualFile)
+    }
+
     fun testMacroCallResolvesAcrossFiles() {
         val other = myFixture.addFileToProject("other.ftl", "<#macro hello>hi</#macro>")
         FileBasedIndex.getInstance()

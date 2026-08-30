@@ -1,6 +1,7 @@
 package com.freemarkerplus.reference
 
 import com.freemarkerplus.psi.FtlExpression
+import com.freemarkerplus.psi.FtlFile
 import com.freemarkerplus.psi.FtlIdentifier
 import com.freemarkerplus.psi.FtlImportDirective
 import com.freemarkerplus.psi.FtlIncludeDirective
@@ -49,6 +50,28 @@ class FtlReferenceContributor : PsiReferenceContributor() {
             }
         )
 
+        // 命名空间引用：限定名根段（lib.hello → lib）若通过 <#import "lib.ftl" as lib> 引入，
+        // 则跳转到被导入文件里的成员声明。注册在变量 provider 之前，且只在根名确为导入别名时
+        // 挂引用——这样 Ctrl+B（findReferenceAt 取第一个匹配）能命中命名空间；非命名空间的
+        // 根段（${user.name} 的 user）不挂命名空间引用，仍由下面的变量引用接管。
+        registrar.registerReferenceProvider(
+            PlatformPatterns.psiElement(FtlIdentifier::class.java)
+                .withParent(FtlPrimary::class.java),
+            object : PsiReferenceProvider() {
+                override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
+                    val expr = PsiTreeUtil.getParentOfType(element, FtlExpression::class.java)
+                        ?: return emptyArray()
+                    // 必须是根段，且是带 DOT 的限定名（至少两个 primary）。
+                    if (expr.firstChild !== element.parent) return emptyArray()
+                    if (expr.primaryList.size < 2) return emptyArray()
+                    // 根名须对应 <#import ... as <name>>，否则不挂命名空间引用（避免遮蔽变量引用）。
+                    val file = element.containingFile as? FtlFile ?: return emptyArray()
+                    if (FtlNamespaceReference.findImportDirective(file, element.text) == null) return emptyArray()
+                    return arrayOf(FtlNamespaceReference(element, TextRange(0, element.textLength)))
+                }
+            }
+        )
+
         // 表达式内的首段标识符（${user}、<#if user> 的 user 等）→ 同文件变量声明。
         // 只匹配 parent 为 FtlPrimary 的标识符，天然排除宏调用名（parent 为 FtlMacroCall）
         // 与声明名（parent 为 assign/list/macro 指令）；根段过滤在 provider 内完成。
@@ -66,23 +89,6 @@ class FtlReferenceContributor : PsiReferenceContributor() {
                     } else {
                         emptyArray()
                     }
-                }
-            }
-        )
-
-        // 命名空间引用：限定名根段（lib.hello → lib）若通过 <#import "lib.ftl" as lib> 引入，
-        // 则跳转到被导入文件里的成员声明。与上面的变量引用共存于同一根标识符（multiResolve）。
-        registrar.registerReferenceProvider(
-            PlatformPatterns.psiElement(FtlIdentifier::class.java)
-                .withParent(FtlPrimary::class.java),
-            object : PsiReferenceProvider() {
-                override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
-                    val expr = PsiTreeUtil.getParentOfType(element, FtlExpression::class.java)
-                        ?: return emptyArray()
-                    // 必须是根段，且是带 DOT 的限定名（至少两个 primary）。
-                    if (expr.firstChild !== element.parent) return emptyArray()
-                    if (expr.primaryList.size < 2) return emptyArray()
-                    return arrayOf(FtlNamespaceReference(element, TextRange(0, element.textLength)))
                 }
             }
         )

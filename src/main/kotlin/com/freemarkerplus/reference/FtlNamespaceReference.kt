@@ -44,13 +44,19 @@ class FtlNamespaceReference(element: PsiElement, rangeInElement: TextRange) :
     }
 
     private fun findImportedFile(file: FtlFile, namespace: String): FtlFile? {
-        // import 指令被外层 outer_element 包裹，须递归查找（getChildrenOfType 只查直接子节点）。
-        val imports = PsiTreeUtil.findChildrenOfType(file, FtlImportDirective::class.java)
-        val import = imports.firstOrNull { it.identifier.text == namespace } ?: return null
+        val import = findImportDirective(file, namespace) ?: return null
         val path = import.stringLiteral.text.trim('\'', '"')
         val vf = file.virtualFile?.parent?.findChild(path) ?: return null
         return PsiManager.getInstance(file.project).findFile(vf) as? FtlFile
     }
 
     override fun getVariants(): Array<Any> = emptyArray()
+
+    companion object {
+        // import 指令被外层 outer_element 包裹，须递归查找（getChildrenOfType 只查直接子节点）。
+        // 供 FtlReferenceContributor 复用：判断根标识符是否为已导入的命名空间别名。
+        fun findImportDirective(file: FtlFile, namespace: String): FtlImportDirective? =
+            PsiTreeUtil.findChildrenOfType(file, FtlImportDirective::class.java)
+                .firstOrNull { it.identifier.text == namespace }
+    }
 }

@@ -38,6 +38,7 @@ freemarker-plus/
 │   │   ├── FtlTokenType.kt                             # token 类型基类
 │   │   ├── FtlParserDefinition.kt                      # ParserDefinition
 │   │   ├── FtlFile.kt                                  # PSI 文件根
+│   │   ├── FtlFileViewProviderFactory.kt               # 单根 FileViewProvider（TemplateLanguage 必需，非 HTML 叠加）
 │   │   └── FtlStringLiteral.kt                         # 字符串字面量（语法生成）
 │   ├── reference/
 │   │   ├── FtlReferenceContributor.kt                  # 引用注册
@@ -268,6 +269,9 @@ git commit -m "chore: add GrammarKit toolchain and initial FTL grammar"
 **Files:**
 - Create: `src/main/kotlin/com/freemarkerplus/psi/FtlParserDefinition.kt`
 - Create: `src/main/kotlin/com/freemarkerplus/psi/FtlFile.kt`
+- Create: `src/main/kotlin/com/freemarkerplus/psi/FtlFileViewProviderFactory.kt`（单根 FileViewProvider——`TemplateLanguage` 语言无 `lang.fileViewProviderFactory` 时 `createFileFromText` 返回 null）
+- Modify: `src/main/grammar/_FtlLexer.flex`（改为状态机 lexer：YYINITIAL/TAG/INTERPOLATION/COMMENT；否则 TEMPLATE_DATA 贪婪吞掉指令/插值内容）
+- Modify: `build.gradle.kts`（仅加 `testBundledPlugin("intellij.libraries.misc.plugin")`，2026.2 EAP 测试模块解析 bug 的 workaround，见 IJPL-248701）
 - Modify: `src/main/resources/META-INF/plugin.xml`
 - Test: `src/test/kotlin/com/freemarkerplus/psi/FtlParserTest.kt`
 

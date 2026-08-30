@@ -2,12 +2,15 @@ package com.freemarkerplus.reference
 
 import com.freemarkerplus.psi.FtlAssignDirective
 import com.freemarkerplus.psi.FtlFunctionDirective
+import com.freemarkerplus.psi.FtlInterpolation
 import com.freemarkerplus.psi.FtlListDirective
 import com.freemarkerplus.psi.FtlMacroCall
 import com.freemarkerplus.psi.FtlMacroDirective
 import com.freemarkerplus.psi.FtlStringLiteral
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import com.intellij.util.indexing.FileBasedIndex
 
 class FtlReferenceTest : BasePlatformTestCase() {
 
@@ -135,5 +138,43 @@ class FtlReferenceTest : BasePlatformTestCase() {
         // 属性段 name 属 Phase 3 Java 数据模型，不应挂变量引用
         myFixture.editor.caretModel.moveToOffset(myFixture.file.text.indexOf("name", myFixture.file.text.indexOf("\${")))
         assertNull(myFixture.file.findReferenceAt(myFixture.editor.caretModel.offset))
+    }
+
+    fun testNamespaceResolvesAcrossFiles() {
+        val lib = myFixture.addFileToProject("lib.ftl", "<#macro hello>hi</#macro>")
+        myFixture.configureByText("main.ftl", "<#import \"lib.ftl\" as lib>\n\${lib.hello}")
+        val interpolation = PsiTreeUtil.findChildOfType(myFixture.file, FtlInterpolation::class.java)
+        assertNotNull(interpolation)
+        val rootIdent = interpolation!!.expression.primaryList.first().identifier
+        assertNotNull(rootIdent)
+        assertEquals("lib", rootIdent!!.text)
+        // 根段 lib 上同时挂了变量引用与命名空间引用；取命名空间引用验证跨文件跳转。
+        val nsRef = rootIdent.references.filterIsInstance<FtlNamespaceReference>().firstOrNull()
+        assertNotNull("expected a namespace reference on the lib root segment", nsRef)
+        val targets = nsRef!!.multiResolve(false)
+        assertTrue("namespace reference should resolve to the hello macro", targets.isNotEmpty())
+        val target = targets.first().element
+        assertNotNull(target)
+        assertEquals("hello", target!!.text)
+        assertTrue(target.parent is FtlMacroDirective)
+        assertEquals(lib.virtualFile, target.containingFile.virtualFile)
+    }
+
+    fun testMacroCallResolvesAcrossFiles() {
+        val other = myFixture.addFileToProject("other.ftl", "<#macro hello>hi</#macro>")
+        FileBasedIndex.getInstance()
+            .ensureUpToDate(FtlFileIndex.NAME, myFixture.project, GlobalSearchScope.allScope(myFixture.project))
+        myFixture.configureByText("main.ftl", "<@hello>")
+        val call = PsiTreeUtil.findChildOfType(myFixture.file, FtlMacroCall::class.java)
+        assertNotNull(call)
+        val ident = call!!.identifier
+        myFixture.editor.caretModel.moveToOffset(ident.textOffset + 1)
+        val ref = myFixture.file.findReferenceAt(myFixture.editor.caretModel.offset)
+        assertNotNull(ref)
+        val target = ref!!.resolve()
+        assertNotNull(target)
+        assertEquals("hello", target!!.text)
+        assertTrue(target.parent is FtlMacroDirective)
+        assertEquals(other.virtualFile, target.containingFile.virtualFile)
     }
 }

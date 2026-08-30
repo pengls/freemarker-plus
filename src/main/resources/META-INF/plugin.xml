@@ -28,5 +28,6 @@
                                   implementation="com.freemarkerplus.reference.FtlReferenceContributor"/>
         <lang.elementManipulator forClass="com.freemarkerplus.psi.FtlStringLiteral"
                                  implementationClass="com.freemarkerplus.reference.FtlStringManipulator"/>
+        <fileBasedIndex implementation="com.freemarkerplus.reference.FtlFileIndex"/>
     </extensions>
 </idea-plugin>

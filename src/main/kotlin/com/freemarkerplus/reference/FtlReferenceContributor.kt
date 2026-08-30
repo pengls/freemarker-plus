@@ -69,6 +69,23 @@ class FtlReferenceContributor : PsiReferenceContributor() {
                 }
             }
         )
+
+        // 命名空间引用：限定名根段（lib.hello → lib）若通过 <#import "lib.ftl" as lib> 引入，
+        // 则跳转到被导入文件里的成员声明。与上面的变量引用共存于同一根标识符（multiResolve）。
+        registrar.registerReferenceProvider(
+            PlatformPatterns.psiElement(FtlIdentifier::class.java)
+                .withParent(FtlPrimary::class.java),
+            object : PsiReferenceProvider() {
+                override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
+                    val expr = PsiTreeUtil.getParentOfType(element, FtlExpression::class.java)
+                        ?: return emptyArray()
+                    // 必须是根段，且是带 DOT 的限定名（至少两个 primary）。
+                    if (expr.firstChild !== element.parent) return emptyArray()
+                    if (expr.primaryList.size < 2) return emptyArray()
+                    return arrayOf(FtlNamespaceReference(element, TextRange(0, element.textLength)))
+                }
+            }
+        )
     }
 
     private fun isFileReferenceHost(element: FtlStringLiteral): Boolean {

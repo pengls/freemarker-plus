@@ -424,13 +424,6 @@ class FreemarkerLexer : LexerBase() {
     }
 
     private fun advanceData() {
-        val c = buffer[pos]
-        if (c == '\\' && pos + 1 < endOffset && (buffer[pos + 1] == '$' || buffer[pos + 1] == '<')) {
-            pos += 2
-            tokenType = TemplateDataElementType.TEMPLATE_DATA
-            tokenEnd = pos
-            return
-        }
         when {
             startsWith(pos, "<#--") -> {
                 tokenType = FreemarkerTokenTypes.COMMENT
@@ -937,13 +930,6 @@ git commit -m "feat: add syntax highlighter with HTML overlay and register file 
 
 ```kotlin
     private fun advanceData() {
-        val c = buffer[pos]
-        if (c == '\\' && pos + 1 < endOffset && (buffer[pos + 1] == '$' || buffer[pos + 1] == '<')) {
-            pos += 2
-            tokenType = TemplateDataElementType.TEMPLATE_DATA
-            tokenEnd = pos
-            return
-        }
         when {
             startsWithIgnoreCase(pos, "<style") -> lexEmbeddedTagStart(Mode.STYLE)
             startsWithIgnoreCase(pos, "<script") -> lexEmbeddedTagStart(Mode.SCRIPT)

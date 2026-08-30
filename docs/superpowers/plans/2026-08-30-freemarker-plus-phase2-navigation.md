@@ -629,7 +629,7 @@ git commit -m "feat: add file references for include/import directives"
 - Test: `src/test/kotlin/com/freemarkerplus/reference/FtlReferenceTest.kt`（加用例）
 
 **Interfaces:**
-- Consumes: `FtlMacro`/`FtlFunction` 声明元素、`FtlElementTypes`（Task 2/3）
+- Consumes: `FtlMacroDirective`/`FtlFunctionDirective` 声明元素、`FtlElementTypes`（Task 2/3）
 - Produces:
   - `FtlMacroReference : PsiPolyVariantReferenceBase<PsiElement>`（`multiResolve` 返回声明）
   - 手写辅助：`FtlPsiUtil.findMacroDeclaration(file, name)` 收集同文件 `<#macro name>`/`<#function name>`
@@ -648,8 +648,8 @@ object FtlPsiUtil {
         val result = mutableListOf<PsiElement>()
         PsiTreeUtil.processElements(file) { el ->
             val ident = when (el) {
-                is FtlMacro -> el.identifier     // <#macro name>
-                is FtlFunction -> el.identifier  // <#function name>
+                is FtlMacroDirective -> el.identifier     // <#macro name>
+                is FtlFunctionDirective -> el.identifier  // <#function name>
                 else -> null
             }
             if (ident != null && ident.text == name) result.add(ident)
@@ -660,7 +660,7 @@ object FtlPsiUtil {
 }
 ```
 
-> `FtlMacro`/`FtlFunction` 由 Task 1 的类型化语法生成（`macro_directive`/`function_directive` 规则），生成的访问器为 `getIdentifier(): FtlIdentifier`。
+> `FtlMacroDirective`/`FtlFunctionDirective` 由 Task 1 的类型化语法生成（`macro_directive`/`function_directive` 规则，GrammarKit 按规则名命名类），生成的访问器为 `getIdentifier(): FtlIdentifier`。
 
 - [ ] **Step 2: 写 `FtlMacroReference.kt`**
 
@@ -743,7 +743,7 @@ git commit -m "feat: add macro/function call references (same-file)"
 - Test: `src/test/kotlin/com/freemarkerplus/reference/FtlReferenceTest.kt`（加用例）
 
 **Interfaces:**
-- Consumes: `FtlAssignDirective`/`FtlListDirective`/`FtlMacro` 参数（Task 2/3）、`FtlPsiUtil`（Task 5）
+- Consumes: `FtlAssignDirective`/`FtlListDirective`/`FtlMacroDirective` 参数（Task 2/3）、`FtlPsiUtil`（Task 5）
 - Produces:
   - `FtlVariableReference : PsiPolyVariantReferenceBase<PsiElement>`（`multiResolve` 返回变量声明）
   - `FtlPsiUtil.findVariableDeclarations(file, name)` 收集变量声明
@@ -863,9 +863,9 @@ package com.freemarkerplus.reference
 
 import com.freemarkerplus.psi.FtlAssignDirective
 import com.freemarkerplus.psi.FtlFile
-import com.freemarkerplus.psi.FtlFunction
+import com.freemarkerplus.psi.FtlFunctionDirective
 import com.freemarkerplus.psi.FtlListDirective
-import com.freemarkerplus.psi.FtlMacro
+import com.freemarkerplus.psi.FtlMacroDirective
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.indexing.*
 import com.intellij.util.io.DataExternalizer
@@ -916,8 +916,8 @@ class FtlFileIndex : FileBasedIndexExtension<String, List<FtlIndexInfo>>() {
         val out = mutableListOf<FtlIndexInfo>()
         PsiTreeUtil.processElements(file) { el ->
             when (el) {
-                is FtlMacro -> out.add(FtlIndexInfo(el.identifier.text, "macro", path))
-                is FtlFunction -> out.add(FtlIndexInfo(el.identifier.text, "function", path))
+                is FtlMacroDirective -> out.add(FtlIndexInfo(el.identifier.text, "macro", path))
+                is FtlFunctionDirective -> out.add(FtlIndexInfo(el.identifier.text, "function", path))
                 is FtlAssignDirective -> out.add(FtlIndexInfo(el.identifier.text, "variable", path))
                 is FtlListDirective -> out.add(FtlIndexInfo(el.identifier.text, "loop", path))
                 else -> {}
@@ -1501,7 +1501,7 @@ git commit -m "docs: add navigation demo and Phase 2 README"
 3. **已知技术风险（如实标注，实现时优先验证）**：
    - GrammarKit 插件（`org.jetbrains.intellij.platform.grammarkit`）在 IPGP 2.16.0 / Gradle 9.7.1 下的确切版本号需 Task 1 Step 1 实测钉死。
    - `FileReferenceSet` 构造签名、GrammarKit 生成的 PSI 工厂类名/访问器名需以 2026.2 SDK 实测校正（各 Task 已标注）。
-   - 引用 pattern 与「声明/引用定位」在 Task 4–8 用文本/正则过渡实现，需在引入类型化 PSI 后收敛为 `FtlMacro`/`FtlFunction`/`FtlAssignDirective` 等元素判断——这是刻意的「先打通、后收敛」策略，避免一上来卡在完整表达式语法。
+   - 引用 pattern 与「声明/引用定位」在 Task 4–8 用文本/正则过渡实现，需在引入类型化 PSI 后收敛为 `FtlMacroDirective`/`FtlFunctionDirective`/`FtlAssignDirective` 等元素判断——这是刻意的「先打通、后收敛」策略，避免一上来卡在完整表达式语法。
 
 ## 已知 Phase 2 边界（如实说明）
 

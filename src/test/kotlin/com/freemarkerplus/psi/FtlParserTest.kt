@@ -54,4 +54,16 @@ class FtlParserTest : BasePlatformTestCase() {
         assertTrue(types.contains(FtlElementTypes.COMMENT_START))
         assertTrue(types.contains(FtlElementTypes.COMMENT_END))
     }
+
+    fun testHtmlDataIsTemplateDataLeaf() {
+        val file = parse("<div>hello</div>")
+        val dataLeaves = leaves(file).filter { it.node?.elementType == FtlElementTypes.TEMPLATE_DATA }
+        assertTrue(dataLeaves.isNotEmpty())
+    }
+
+    fun testMixedContentParsed() {
+        val file = parse("<div>\${user}</div><#if x>y</#if>")
+        assertNotNull(PsiTreeUtil.findChildOfType(file, FtlInterpolation::class.java))
+        assertNotNull(PsiTreeUtil.findChildOfType(file, FtlGenericDirective::class.java))
+    }
 }

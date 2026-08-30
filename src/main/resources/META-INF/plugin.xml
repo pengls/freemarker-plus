@@ -43,5 +43,7 @@
                              implementationClass="com.freemarkerplus.navigation.FtlFoldingBuilder"/>
         <breadcrumbsInfoProvider implementation="com.freemarkerplus.navigation.FtlBreadcrumbsInfoProvider"/>
         <renamePsiElementProcessor implementation="com.freemarkerplus.navigation.FtlRenameProcessor"/>
+        <lang.namesValidator language="FTL"
+                             implementationClass="com.freemarkerplus.navigation.FtlNamesValidator"/>
     </extensions>
 </idea-plugin>

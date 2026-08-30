@@ -8,12 +8,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.freemarkerplus.psi.FtlElementTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.freemarkerplus.psi.*;
 
-public class FtlIdentifierImpl extends ASTWrapperPsiElement implements FtlIdentifier {
+public class FtlIdentifierImpl extends FtlIdentifierMixin implements FtlIdentifier {
 
-  public FtlIdentifierImpl(@NotNull ASTNode node) {
+  public FtlIdentifierImpl(ASTNode node) {
     super(node);
   }
 

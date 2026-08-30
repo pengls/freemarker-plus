@@ -20,16 +20,18 @@ An IntelliJ IDEA plugin that provides rich syntax highlighting for FreeMarker te
 
 The following categories are available in **Settings → Editor → Color Scheme → Freemarker**:
 
-| Category                     | Default Color | Example                     |
-|------------------------------|---------------|-----------------------------|
-| Comment                      | Gray          | `<#-- comment -->`          |
-| String                       | Green         | `"hello"`, `'world'`        |
-| Keyword                      | Orange        | `gt`, `true`, `if`, `as`   |
-| Directive name               | Purple        | `if`, `list`, `assign`      |
-| Interpolation delimiters     | Gray          | `${`, `}`, `<#`, `>`        |
-| Number                       | Blue          | `42`, `3.14`                |
-| Operator                     | Gray          | `.`, `=`, `(`, `)`          |
-| Bad character                | Red           | Unexpected tokens           |
+| Category                     | Example                     |
+|------------------------------|-----------------------------|
+| Comment                      | `<#-- comment -->`          |
+| String                       | `"hello"`, `'world'`        |
+| Keyword                      | `gt`, `true`, `if`, `as`   |
+| Directive name               | `if`, `list`, `assign`      |
+| Interpolation delimiters     | `${`, `}`, `<#`, `>`        |
+| Number                       | `42`, `3.14`                |
+| Operator                     | `.`, `=`, `(`, `)`          |
+| Bad character                | Unexpected tokens           |
+
+Colors follow your active color scheme and are anchored to standard IntelliJ language defaults. Customize them under **Settings → Editor → Color Scheme → Freemarker**.
 
 ## Installation
 
@@ -43,7 +45,7 @@ The following categories are available in **Settings → Editor → Color Scheme
 
 ```bash
 # Build the plugin ZIP
-D:\gradle-dist\gradle-9.7.1\bin\gradle.bat buildPlugin
+./gradlew buildPlugin
 
 # The distributable is at:
 # build/distributions/freemarker-plus-0.1.0.zip
@@ -62,13 +64,13 @@ To install from the built ZIP, follow the "From ZIP" instructions above.
 
 ```bash
 # Run all tests
-D:\gradle-dist\gradle-9.7.1\bin\gradle.bat test
+./gradlew test
 
 # Build the plugin distribution
-D:\gradle-dist\gradle-9.7.1\bin\gradle.bat buildPlugin
+./gradlew buildPlugin
 
 # Launch a sandbox IDE with the plugin installed
-D:\gradle-dist\gradle-9.7.1\bin\gradle.bat runIde
+./gradlew runIde
 ```
 
 ### Project Structure
@@ -124,4 +126,4 @@ Open `examples/demo.ftl` in the sandbox IDE to see all highlighting features in 
 
 ## License
 
-MIT
+License: to be decided

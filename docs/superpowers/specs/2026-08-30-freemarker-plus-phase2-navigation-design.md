@@ -91,7 +91,7 @@ Phase 2 目标：为 `.ftl` 文件提供**代码导航（Code Navigation）**能
 ### 3.1 本阶段包含
 
 - PSI 地基：GrammarKit 语法 + 生成的 `FtlParser`/`FtlLexer` + `FtlParserDefinition` + `FtlFile` + 元素类型
-- 模板语言 FileViewProvider：HTML 数据层 + FTL 模板层（复用平台 HTML PSI）
+- 扁平 FTL PSI：整份 `.ftl` 由 FTL 解析器解析，HTML/CSS/JS 数据区为不透明的 `TEMPLATE_DATA` 叶节点（不叠加 HTML PSI，见 §4.2）
 - 引用与跳转：文件引用、宏/函数引用、变量引用、命名空间引用（同文件 + 跨文件）
 - 查找引用、结构视图、折叠、面包屑、重命名
 - 跨文件宏/变量声明的文件级索引
@@ -126,7 +126,7 @@ Phase 2 目标：为 `.ftl` 文件提供**代码导航（Code Navigation）**能
 ### 4.3 保留 Phase 1 高亮，新增 PSI 高亮兜底
 
 - 保留现有 `lang.syntaxHighlighterFactory`（`FreemarkerSyntaxHighlighter`）不动，避免破坏 Phase 1 的高亮。
-- 新增 `editorHighlighterProvider`（`FtlEditorHighlighterProvider`）让编辑器在 PSI 可用时走模板语言高亮；两者对用户透明。
+- `editorHighlighterProvider`（`FtlEditorHighlighterProvider`）——未实现（Phase 2 未做；高亮继续走 Phase 1 的 `lang.syntaxHighlighterFactory`）。
 - 若二者存在视觉差异，以 Phase 1 的配色页（`FreemarkerColorSettingsPage`）为准，逐步对齐。
 
 ---
@@ -287,7 +287,7 @@ string_literal    ::= STRING_LITERAL
 
 ## 8. 结构视图 / 折叠 / 面包屑
 
-- **结构视图**（`FtlStructureViewModel`）：列出顶层与嵌套的「指令」节点（`#if`/`#list`/`#macro`/`#function`/`#assign`/`#include`/`#import` 等），图标/文本取自指令名 + 摘要。数据区（HTML）为不透明叶节点，不进入结构视图。
+- **结构视图**（`FtlStructureViewModel`）：列出「指令」节点（扁平列表，嵌套树留待后续语法增强；`#if`/`#list`/`#macro`/`#function`/`#assign`/`#include`/`#import` 等），图标/文本取自指令名 + 摘要。数据区（HTML）为不透明叶节点，不进入结构视图。
 - **折叠**（`FtlFoldingBuilder`）：对成对的块级指令（`<#if>/</#if>`、`<#list>/</#list>`、`<#macro>/</#macro>`、`<#function>/</#function>`、`<#switch>/</#switch>` 等）生成 `FoldingDescriptor`，占位文本为 `<#if>` 或 `<#if condition>`。
 - **面包屑**（`FtlBreadcrumbsInfoProvider`）：`acceptElement` 接受指令/宏节点，`getElementInfo` 返回 `<#list items>` 之类的文本，`getParent` 返回外层指令。
 

@@ -289,7 +289,7 @@ string_literal    ::= STRING_LITERAL
 
 - **结构视图**（`FtlStructureViewModel`）：列出「指令」节点（扁平列表，嵌套树留待后续语法增强；`#if`/`#list`/`#macro`/`#function`/`#assign`/`#include`/`#import` 等），图标/文本取自指令名 + 摘要。数据区（HTML）为不透明叶节点，不进入结构视图。
 - **折叠**（`FtlFoldingBuilder`）：对成对的块级指令（`<#if>/</#if>`、`<#list>/</#list>`、`<#macro>/</#macro>`、`<#function>/</#function>`、`<#switch>/</#switch>` 等）生成 `FoldingDescriptor`，占位文本为 `<#if>` 或 `<#if condition>`。
-- **面包屑**（`FtlBreadcrumbsInfoProvider`）：`acceptElement` 接受指令/宏节点，`getElementInfo` 返回 `<#list items>` 之类的文本，`getParent` 返回外层指令。
+- **面包屑**（`FtlBreadcrumbsInfoProvider`）：`acceptElement` 接受指令/宏节点，`getElementInfo` 返回 `<#list items>` 之类的文本，`getParent` 返回 `element.parent`（扁平 PSI 下的直接父节点；嵌套层级树留待后续语法增强）。
 
 ---
 

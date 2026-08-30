@@ -286,6 +286,7 @@ import com.freemarkerplus.lang.FreemarkerLanguage
 import com.intellij.lang.ASTNode
 import com.intellij.lang.ParserDefinition
 import com.intellij.lang.PsiParser
+import com.intellij.lexer.FlexAdapter
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.project.Project
 import com.intellij.psi.FileViewProvider
@@ -296,7 +297,7 @@ import com.intellij.psi.tree.TokenSet
 
 class FtlParserDefinition : ParserDefinition {
 
-    override fun createLexer(project: Project): Lexer = _FtlLexer()
+    override fun createLexer(project: Project): Lexer = FlexAdapter(_FtlLexer())
 
     override fun createParser(project: Project): PsiParser = FtlParser()
 

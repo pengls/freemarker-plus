@@ -34,5 +34,10 @@
         <findUsagesHandlerFactory implementation="com.freemarkerplus.navigation.FtlFindUsagesHandlerFactory"/>
         <definitionsSearch implementation="com.freemarkerplus.navigation.FtlDefinitionSearcher"/>
         <referencesSearch implementation="com.freemarkerplus.navigation.FtlMethodUsageSearcher"/>
+        <lang.psiStructureViewFactory language="FTL"
+                                      implementationClass="com.freemarkerplus.navigation.FtlStructureViewBuilderProvider"/>
+        <lang.foldingBuilder language="FTL"
+                             implementationClass="com.freemarkerplus.navigation.FtlFoldingBuilder"/>
+        <breadcrumbsInfoProvider implementation="com.freemarkerplus.navigation.FtlBreadcrumbsInfoProvider"/>
     </extensions>
 </idea-plugin>

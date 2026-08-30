@@ -16,7 +16,7 @@
 - 语言 ID：`FTL`；文件类型名：`FreeMarker Template`；扩展名：`ftl`
 - 源码语言：Kotlin；构建脚本：Kotlin DSL；基础包名：`com.freemarkerplus`
 - 颜色一律走 `TextAttributesKey` + `DefaultLanguageHighlighterColors`（主题感知），**禁止硬编码 RGB**
-- 工具链：JDK 21（toolchain）、Gradle 8.14、IntelliJ Platform Gradle Plugin `2.16.0`、Kotlin `2.1.20`
+- 工具链：JDK 21（toolchain）、Gradle 9.7.1、IntelliJ Platform Gradle Plugin `2.16.0`、Kotlin `2.3.0`
 - 每个 Task 结束都必须 `git commit`；提交信息用 `feat:` / `test:` / `chore:` 前缀
 - 本阶段**不写 PSI 解析器**，因此无补全/跳转/折叠/语义报错
 

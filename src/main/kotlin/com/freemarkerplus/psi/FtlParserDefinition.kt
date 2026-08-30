@@ -22,9 +22,9 @@ class FtlParserDefinition : ParserDefinition {
 
     override fun getFileNodeType(): IFileElementType = FILE
 
-    override fun getCommentTokens(): TokenSet = TokenSet.create(FtlElementTypes.COMMENT)
+    override fun getCommentTokens(): TokenSet = TokenSet.create(FtlElementTypes.COMMENT_START, FtlElementTypes.COMMENT_END)
 
-    override fun getStringLiteralElements(): TokenSet = TokenSet.create(FtlElementTypes.STRING_LITERAL)
+    override fun getStringLiteralElements(): TokenSet = TokenSet.create(FtlElementTypes.STRING)
 
     override fun getWhitespaceTokens(): TokenSet = TokenSet.create(TokenType.WHITE_SPACE)
 

@@ -1,9 +1,9 @@
 <idea-plugin>
     <id>com.freemarkerplus</id>
     <name>Freemarker Plus</name>
-    <vendor>freemarker-plus</vendor>
+    <vendor>pengl</vendor>
     <description><![CDATA[
-        Syntax highlighting for FreeMarker templates (.ftl) with HTML/CSS/JS support.
+        Syntax highlighting for FreeMarker templates (.ftl, .ftlh, .ftlx) with HTML/CSS/JS support.
     ]]></description>
 
     <idea-version since-build="262" until-build="262.*"/>
@@ -16,7 +16,7 @@
                   implementationClass="com.freemarkerplus.lang.FreemarkerFileType"
                   fieldName="INSTANCE"
                   language="FTL"
-                  extensions="ftl"/>
+                  extensions="ftl;ftlh;ftlx"/>
         <lang.syntaxHighlighterFactory language="FTL"
                                        implementationClass="com.freemarkerplus.highlighting.FreemarkerSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="com.freemarkerplus.highlighting.FreemarkerColorSettingsPage"/>

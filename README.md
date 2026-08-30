@@ -1,6 +1,6 @@
 # Freemarker Plus
 
-An IntelliJ IDEA plugin that provides rich syntax highlighting for FreeMarker template files (`.ftl`), with embedded CSS and JavaScript support.
+An IntelliJ IDEA plugin that provides rich syntax highlighting for FreeMarker template files (`.ftl`, `.ftlh`, `.ftlx`), with embedded CSS and JavaScript support.
 
 ## Features
 
@@ -12,9 +12,11 @@ An IntelliJ IDEA plugin that provides rich syntax highlighting for FreeMarker te
 
 ## Supported File Types
 
-| Extension | Description           |
-|-----------|-----------------------|
-| `.ftl`    | FreeMarker template   |
+| Extension | Description                      |
+|-----------|----------------------------------|
+| `.ftl`    | FreeMarker template (plain text) |
+| `.ftlh`   | FreeMarker template (HTML)       |
+| `.ftlx`   | FreeMarker template (XML)        |
 
 ## Highlight Categories
 
@@ -126,4 +128,4 @@ Open `examples/demo.ftl` in the sandbox IDE to see all highlighting features in 
 
 ## License
 
-License: to be decided
+This project is licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for details.

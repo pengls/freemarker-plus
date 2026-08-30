@@ -28,4 +28,15 @@ class FtlReferenceTest : BasePlatformTestCase() {
         assertNotNull(ref)
         assertEquals(lib.virtualFile, ref?.resolve()?.containingFile?.virtualFile)
     }
+
+    fun testNestedIncludeResolvesToFile() {
+        val inc = myFixture.addFileToProject("partials/inc.ftl", "<#-- inc -->")
+        myFixture.configureByText("main.ftl", "<#include \"partials/inc.ftl\">")
+        val literal = PsiTreeUtil.findChildOfType(myFixture.file, FtlStringLiteral::class.java)
+        assertNotNull(literal)
+        myFixture.editor.caretModel.moveToOffset(literal!!.textOffset + 2)
+        val ref = myFixture.file.findReferenceAt(myFixture.editor.caretModel.offset)
+        assertNotNull(ref)
+        assertEquals(inc.virtualFile, ref?.resolve()?.containingFile?.virtualFile)
+    }
 }

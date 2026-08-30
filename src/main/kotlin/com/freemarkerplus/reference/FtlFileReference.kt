@@ -16,7 +16,10 @@ class FtlFileReference(element: FtlStringLiteral, rangeInElement: TextRange) :
         FileReferenceSet(path, myElement, rangeInElement.startOffset, null, true, true, null)
     }
 
-    override fun resolve(): PsiElement? = delegate.allReferences.firstOrNull()?.resolve()
+    // FileReferenceSet splits the path on '/', producing one FileReference per
+    // segment; the last one targets the file itself (the earlier ones target
+    // intermediate directories).
+    override fun resolve(): PsiElement? = delegate.allReferences.lastOrNull()?.resolve()
 
-    override fun getVariants(): Array<Any> = delegate.allReferences.firstOrNull()?.variants ?: emptyArray()
+    override fun getVariants(): Array<Any> = delegate.allReferences.lastOrNull()?.variants ?: emptyArray()
 }

@@ -20,3 +20,8 @@ local.properties
 /idea/
 /liveTemplates/
 /*.xml
+
+# Spike scratch directories (decompiled platform sources etc.)
+.spike/
+.spike2/
+

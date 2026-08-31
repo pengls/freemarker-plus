@@ -619,7 +619,7 @@ public class _FtlLexer implements FlexLexer {
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1:
-            { return TEMPLATE_DATA;
+            { return TEMPLATE_TEXT;
             }
           // fall through
           case 40: break;

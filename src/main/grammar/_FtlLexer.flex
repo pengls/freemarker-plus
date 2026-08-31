@@ -31,7 +31,7 @@ WHITE_SPACE=\s+
 IDENT=[a-zA-Z_][a-zA-Z0-9_]*
 STRING='([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\"
 NUMBER=[0-9]+(\.[0-9]+)?
-TEMPLATE_DATA=([^<#$]|\$[^{]|\#[^{]|<[^#@/]|<\/[^#@])+
+TEMPLATE_TEXT=([^<#$]|\$[^{]|\#[^{]|<[^#@/]|<\/[^#@])+
 
 %%
 
@@ -44,7 +44,7 @@ TEMPLATE_DATA=([^<#$]|\$[^{]|\#[^{]|<[^#@/]|<\/[^#@])+
   "</@"                   { yybegin(TAG); return CLOSE_MACRO; }
   "${"                    { yybegin(INTERPOLATION); return OPEN_INTERPOLATION; }
   "#{"                    { yybegin(INTERPOLATION); return OPEN_LEGACY; }
-  {TEMPLATE_DATA}         { return TEMPLATE_DATA; }
+  {TEMPLATE_TEXT}          { return TEMPLATE_TEXT; }
 }
 
 // Inside <#...> / </#...> / <@...> / </@...>

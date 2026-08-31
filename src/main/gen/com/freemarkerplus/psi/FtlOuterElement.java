@@ -38,6 +38,6 @@ public interface FtlOuterElement extends PsiElement {
   FtlMacroDirective getMacroDirective();
 
   @Nullable
-  PsiElement getTemplateData();
+  PsiElement getTemplateText();
 
 }

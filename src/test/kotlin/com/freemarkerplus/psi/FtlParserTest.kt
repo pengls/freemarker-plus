@@ -35,7 +35,7 @@ class FtlParserTest : BasePlatformTestCase() {
         val file = parse("price \$5")
         assertFalse("expected no error elements", PsiTreeUtil.hasErrorElements(file))
         assertTrue(leaves(file).none { it.node?.elementType == TokenType.BAD_CHARACTER })
-        assertTrue(leaves(file).any { it.node?.elementType == FtlElementTypes.TEMPLATE_DATA })
+        assertTrue(leaves(file).any { it.node?.elementType == FtlElementTypes.TEMPLATE_TEXT })
     }
 
     fun testHtmlClosingTagIsTemplateData() {
@@ -43,7 +43,7 @@ class FtlParserTest : BasePlatformTestCase() {
         assertFalse("expected no error elements", PsiTreeUtil.hasErrorElements(file))
         assertTrue(leaves(file).none { it.node?.elementType == TokenType.BAD_CHARACTER })
         val dataText = leaves(file)
-            .filter { it.node?.elementType == FtlElementTypes.TEMPLATE_DATA }
+            .filter { it.node?.elementType == FtlElementTypes.TEMPLATE_TEXT }
             .joinToString("") { it.text }
         assertTrue(dataText.contains("</div>"))
     }
@@ -57,7 +57,7 @@ class FtlParserTest : BasePlatformTestCase() {
 
     fun testHtmlDataIsTemplateDataLeaf() {
         val file = parse("<div>hello</div>")
-        val dataLeaves = leaves(file).filter { it.node?.elementType == FtlElementTypes.TEMPLATE_DATA }
+        val dataLeaves = leaves(file).filter { it.node?.elementType == FtlElementTypes.TEMPLATE_TEXT }
         assertTrue(dataLeaves.isNotEmpty())
     }
 
@@ -94,7 +94,7 @@ class FtlParserTest : BasePlatformTestCase() {
         assertNotNull(PsiTreeUtil.findChildOfType(file, FtlAssignDirective::class.java))
         assertFalse("expected no error elements", PsiTreeUtil.hasErrorElements(file))
         assertTrue(leaves(file).none { it.node?.elementType == TokenType.BAD_CHARACTER })
-        // 闭合标签走 generic_directive
+        // 闭合标签�?generic_directive
         val generic = PsiTreeUtil.findChildrenOfType(file, FtlGenericDirective::class.java)
         assertTrue(generic.any { it.text == "</#list>" })
         assertTrue(generic.any { it.text == "</#assign>" })

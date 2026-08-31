@@ -89,8 +89,8 @@ public class FtlOuterElementImpl extends ASTWrapperPsiElement implements FtlOute
 
   @Override
   @Nullable
-  public PsiElement getTemplateData() {
-    return findChildByType(TEMPLATE_DATA);
+  public PsiElement getTemplateText() {
+    return findChildByType(TEMPLATE_TEXT);
   }
 
 }

@@ -431,7 +431,7 @@ public class FtlParser implements PsiParser, LightPsiParser {
   /* ********************************************************** */
   // COMMENT | include_directive | import_directive | assign_directive
   //                    | macro_directive | function_directive | list_directive
-  //                    | macro_call | interpolation | generic_directive | TEMPLATE_DATA
+  //                    | macro_call | interpolation | generic_directive | TEMPLATE_TEXT
   public static boolean outer_element(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "outer_element")) return false;
     boolean result_;
@@ -446,7 +446,7 @@ public class FtlParser implements PsiParser, LightPsiParser {
     if (!result_) result_ = macro_call(builder_, level_ + 1);
     if (!result_) result_ = interpolation(builder_, level_ + 1);
     if (!result_) result_ = generic_directive(builder_, level_ + 1);
-    if (!result_) result_ = consumeToken(builder_, TEMPLATE_DATA);
+    if (!result_) result_ = consumeToken(builder_, TEMPLATE_TEXT);
     exit_section_(builder_, level_, marker_, result_, false, null);
     return result_;
   }

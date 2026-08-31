@@ -5,16 +5,15 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.FileViewProviderFactory
 import com.intellij.psi.PsiManager
-import com.intellij.psi.SingleRootFileViewProvider
 
 /**
- * Flat FTL PSI: a single-root view provider (no HTML data-language overlay).
+ * Flat FTL PSI + 模板语言数据区：单根 view provider（[FtlFileViewProvider]）。
  *
- * `FreemarkerLanguage` is a [com.intellij.psi.templateLanguages.TemplateLanguage] (Phase 1),
- * so the platform would otherwise fall back to `TemplateFileViewProviderFactory`, which
- * returns `null` when no template data language is mapped. This factory pins FTL to the
- * standard single-root view provider so `PsiFileFactory.createFileFromText` (and normal
- * file opening) produces an `FtlFile` via `FtlParserDefinition`.
+ * `FreemarkerLanguage` 是 [com.intellij.psi.templateLanguages.TemplateLanguage]（Phase 1），
+ * 平台默认会回退到 `TemplateFileViewProviderFactory`（无模板数据语言映射时返回 null），
+ * 因此这里显式固定为 [FtlFileViewProvider]：单根 FTL PSI + 实现
+ * `TemplateLanguageFileViewProvider`，让数据区 `TEMPLATE_DATA` chameleon 可按模板语言机制
+ * 展开为 HTML PSI。
  */
 class FtlFileViewProviderFactory : FileViewProviderFactory {
     override fun createFileViewProvider(
@@ -22,5 +21,5 @@ class FtlFileViewProviderFactory : FileViewProviderFactory {
         language: Language,
         manager: PsiManager,
         eventSystemEnabled: Boolean
-    ): FileViewProvider = SingleRootFileViewProvider(manager, file, eventSystemEnabled)
+    ): FileViewProvider = FtlFileViewProvider(manager, file, eventSystemEnabled)
 }

@@ -61,7 +61,7 @@ public interface FtlElementTypes {
   IElementType STRING = new FtlTokenType("STRING");
   IElementType SWITCH = new FtlTokenType("switch");
   IElementType TAG_END = new FtlTokenType(">");
-  IElementType TEMPLATE_DATA = new FtlTokenType("TEMPLATE_DATA");
+  IElementType TEMPLATE_TEXT = new FtlTokenType("TEMPLATE_TEXT");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {

@@ -1,0 +1,3 @@
+# GrammarKit 生成源码：统一 LF 存储（生成器在 Windows 上输出 CRLF，
+# 用 eol=lf 让 diff/提交不受行尾噪音干扰，重新生成后内容 diff 保持最小）。
+src/main/gen/** text eol=lf

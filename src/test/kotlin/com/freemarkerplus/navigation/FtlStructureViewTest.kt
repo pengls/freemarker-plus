@@ -55,7 +55,7 @@ class FtlStructureViewTest : BasePlatformTestCase() {
     fun testBreadcrumbsAcceptsDirectives() {
         myFixture.configureByText("main.ftl", "<#if x>\nhello\n</#if>\n<@greet/>")
         val provider = FtlBreadcrumbsInfoProvider()
-        assertTrue(provider.languages.any { it.id == "FTL" })
+        assertTrue(provider.languages.any { it.id == "FreemarkerPlus" })
 
         val generic = PsiTreeUtil.findChildrenOfType(myFixture.file, FtlGenericDirective::class.java)
         val open = generic.first { !it.isClosingDirective() }

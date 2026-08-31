@@ -23,7 +23,7 @@ import com.intellij.refactoring.rename.RenamePsiElementProcessor
  */
 class FtlRenameProcessor : RenamePsiElementProcessor() {
     override fun canProcessElement(element: PsiElement): Boolean {
-        if (element.language.id != "FTL") return false
+        if (element.language.id != "FreemarkerPlus") return false
         val identifier = element as? FtlIdentifier ?: element.parent as? FtlIdentifier
         return identifier?.parent !is FtlImportDirective
     }

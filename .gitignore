@@ -1,4 +1,4 @@
-.gradle/
+﻿.gradle/
 build/
 .idea/
 .intellijPlatform/
@@ -22,6 +22,5 @@ local.properties
 /*.xml
 
 # Spike scratch directories (decompiled platform sources etc.)
-.spike/
-.spike2/
+.spike*/
 

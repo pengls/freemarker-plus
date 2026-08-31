@@ -12,7 +12,7 @@ import com.intellij.psi.PsiElement
  */
 class FtlFindUsagesProvider : FindUsagesProvider {
     override fun canFindUsagesFor(element: PsiElement): Boolean =
-        element.language.id == "FTL"
+        element.language.id == "FreemarkerPlus"
 
     override fun getHelpId(element: PsiElement): String = "reference.dialogs.findUsages"
 

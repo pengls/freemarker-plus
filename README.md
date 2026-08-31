@@ -63,7 +63,7 @@ Colors follow your active color scheme and are anchored to standard IntelliJ lan
 
 ### From ZIP (Manual)
 
-1. Download the `freemarker-plus-0.3.1.zip` from the releases.
+1. Download the `freemarker-plus-0.3.2.zip` from the releases.
 2. In IntelliJ IDEA, go to **Settings 鈫?Plugins 鈫?鈿?鈫?Install Plugin from Disk...**
 3. Select the downloaded ZIP file and restart the IDE.
 
@@ -74,7 +74,7 @@ Colors follow your active color scheme and are anchored to standard IntelliJ lan
 ./gradlew buildPlugin
 
 # The distributable is at:
-# build/distributions/freemarker-plus-0.3.1.zip
+# build/distributions/freemarker-plus-0.3.2.zip
 ```
 
 To install from the built ZIP, follow the "From ZIP" instructions above.

@@ -30,7 +30,7 @@ class FtlHtmlNavigationTest : BasePlatformTestCase() {
 
     private fun dataFile(): PsiElement? {
         val vp = myFixture.file.viewProvider
-        val dataLang = vp.languages.firstOrNull { it.id != "FTL" } ?: return null
+        val dataLang = vp.languages.firstOrNull { it.id != "FreemarkerPlus" } ?: return null
         return vp.getPsi(dataLang)
     }
 

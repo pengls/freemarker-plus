@@ -14,37 +14,37 @@
     <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <lang.parserDefinition language="FTL"
+        <lang.parserDefinition language="FreemarkerPlus"
                                implementationClass="com.freemarkerplus.psi.FtlParserDefinition"/>
-        <lang.fileViewProviderFactory language="FTL"
+        <lang.fileViewProviderFactory language="FreemarkerPlus"
                                       implementationClass="com.freemarkerplus.psi.FtlFileViewProviderFactory"/>
         <fileType name="FreeMarker Template"
                   implementationClass="com.freemarkerplus.lang.FreemarkerFileType"
                   fieldName="INSTANCE"
-                  language="FTL"
+                  language="FreemarkerPlus"
                   extensions="ftl;ftlh;ftlx"/>
-        <lang.syntaxHighlighterFactory language="FTL"
+        <lang.syntaxHighlighterFactory language="FreemarkerPlus"
                                        implementationClass="com.freemarkerplus.highlighting.FreemarkerSyntaxHighlighterFactory"/>
         <colorSettingsPage implementation="com.freemarkerplus.highlighting.FreemarkerColorSettingsPage"/>
-        <psi.referenceContributor language="FTL"
+        <psi.referenceContributor language="FreemarkerPlus"
                                   implementation="com.freemarkerplus.reference.FtlReferenceContributor"/>
         <lang.elementManipulator forClass="com.freemarkerplus.psi.FtlStringLiteral"
                                  implementationClass="com.freemarkerplus.reference.FtlStringManipulator"/>
         <lang.elementManipulator forClass="com.freemarkerplus.psi.FtlIdentifier"
                                  implementationClass="com.freemarkerplus.reference.FtlIdentifierManipulator"/>
         <fileBasedIndex implementation="com.freemarkerplus.reference.FtlFileIndex"/>
-        <lang.findUsagesProvider language="FTL"
+        <lang.findUsagesProvider language="FreemarkerPlus"
                                  implementationClass="com.freemarkerplus.navigation.FtlFindUsagesProvider"/>
         <findUsagesHandlerFactory implementation="com.freemarkerplus.navigation.FtlFindUsagesHandlerFactory"/>
         <definitionsSearch implementation="com.freemarkerplus.navigation.FtlDefinitionSearcher"/>
         <referencesSearch implementation="com.freemarkerplus.navigation.FtlMethodUsageSearcher"/>
-        <lang.psiStructureViewFactory language="FTL"
+        <lang.psiStructureViewFactory language="FreemarkerPlus"
                                       implementationClass="com.freemarkerplus.navigation.FtlStructureViewBuilderProvider"/>
-        <lang.foldingBuilder language="FTL"
+        <lang.foldingBuilder language="FreemarkerPlus"
                              implementationClass="com.freemarkerplus.navigation.FtlFoldingBuilder"/>
         <breadcrumbsInfoProvider implementation="com.freemarkerplus.navigation.FtlBreadcrumbsInfoProvider"/>
         <renamePsiElementProcessor implementation="com.freemarkerplus.navigation.FtlRenameProcessor"/>
-        <lang.namesValidator language="FTL"
+        <lang.namesValidator language="FreemarkerPlus"
                              implementationClass="com.freemarkerplus.navigation.FtlNamesValidator"/>
     </extensions>
 </idea-plugin>

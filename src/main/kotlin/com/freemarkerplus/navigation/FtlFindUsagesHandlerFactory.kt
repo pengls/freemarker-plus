@@ -9,7 +9,7 @@ import com.intellij.psi.PsiElement
  * ReferencesSearch 收集引用，正好命中我们注册的 referencesSearch searcher。
  */
 class FtlFindUsagesHandlerFactory : FindUsagesHandlerFactory() {
-    override fun canFindUsages(element: PsiElement): Boolean = element.language.id == "FTL"
+    override fun canFindUsages(element: PsiElement): Boolean = element.language.id == "FreemarkerPlus"
 
     override fun createFindUsagesHandler(element: PsiElement, forHighlightUsages: Boolean): FindUsagesHandler =
         object : FindUsagesHandler(element) {}

@@ -1,21 +1,21 @@
-# Freemarker Plus
+﻿# Freemarker Plus
 
 An IntelliJ IDEA plugin that provides rich syntax highlighting and code navigation for FreeMarker template files (`.ftl`, `.ftlh`, `.ftlx`), with embedded CSS and JavaScript support.
 
 ## Features
 
-- **FreeMarker syntax highlighting** — comments, directives (`<#if>`, `<#list>`, `<#assign>`, ...), macro calls (`<@...>`), interpolation (`${...}`), strings, numbers, keywords, and operators.
-- **HTML highlighting** — full HTML tag, attribute, and content highlighting via IntelliJ's built-in HTML lexer.
-- **Embedded CSS highlighting** — CSS code inside `<style>` blocks is highlighted with the platform CSS lexer.
-- **Embedded JavaScript highlighting** — JavaScript code inside `<script>` blocks is highlighted with the platform JS lexer.
-- **Color scheme customization** — all FreeMarker token colors are configurable at **Settings → Editor → Color Scheme → Freemarker**.
+- **FreeMarker syntax highlighting** 鈥?comments, directives (`<#if>`, `<#list>`, `<#assign>`, ...), macro calls (`<@...>`), interpolation (`${...}`), strings, numbers, keywords, and operators.
+- **HTML highlighting** 鈥?full HTML tag, attribute, and content highlighting via IntelliJ's built-in HTML lexer.
+- **Embedded CSS highlighting** 鈥?CSS code inside `<style>` blocks is highlighted with the platform CSS lexer.
+- **Embedded JavaScript highlighting** 鈥?JavaScript code inside `<script>` blocks is highlighted with the platform JS lexer.
+- **Color scheme customization** 鈥?all FreeMarker token colors are configurable at **Settings 鈫?Editor 鈫?Color Scheme 鈫?Freemarker**.
 
 ## Code Navigation (Phase 2)
 
-- **Go to declaration** (Ctrl+B) — `#include`/`#import` file paths, `<@macro>` calls, `${variable}` references, `ns.member` namespaces.
-- **Find usages** (Alt+F7) — macros, functions, variables.
-- **Structure view** (Alt+7) — directives, macros, includes.
-- **Code folding** — `<#if>/<#list>/<#macro>/<#function>/<#switch>` blocks.
+- **Go to declaration** (Ctrl+B) 鈥?`#include`/`#import` file paths, `<@macro>` calls, `${variable}` references, `ns.member` namespaces.
+- **Find usages** (Alt+F7) 鈥?macros, functions, variables.
+- **Structure view** (Alt+7) 鈥?directives, macros, includes.
+- **Code folding** 鈥?`<#if>/<#list>/<#macro>/<#function>/<#switch>` blocks.
 - **Breadcrumbs** and **rename** (Shift+F6).
 
 ## HTML & JavaScript Navigation (Phase 2.5)
@@ -23,11 +23,11 @@ An IntelliJ IDEA plugin that provides rich syntax highlighting and code navigati
 Since Phase 2.5, the HTML/CSS/JS data area of a `.ftl` file is parsed into real HTML PSI
 (the platform template-language mechanism, same architecture as the official plugin):
 
-- **`onclick="login()"` → JS function** — event-handler attributes resolve to the `login`
+- **`onclick="login()"` 鈫?JS function** 鈥?event-handler attributes resolve to the `login`
   function declared in the same file's `<script>` block, and to functions in external `.js`
   files referenced via `<script src="app.js">`.
-- **`<script src="app.js">` → file** — Ctrl+B on the `src` path opens the JavaScript file.
-- **HTML navigation** — tags and attributes get the platform's native navigation/usage support.
+- **`<script src="app.js">` 鈫?file** 鈥?Ctrl+B on the `src` path opens the JavaScript file.
+- **HTML navigation** 鈥?tags and attributes get the platform's native navigation/usage support.
 
 > Note: JavaScript features require the IDE's JavaScript support (bundled in IntelliJ IDEA
 > Ultimate and WebStorm). On Community Edition without the JS plugin, HTML navigation still
@@ -44,7 +44,7 @@ Since Phase 2.5, the HTML/CSS/JS data area of a `.ftl` file is parsed into real 
 
 ## Highlight Categories
 
-The following categories are available in **Settings → Editor → Color Scheme → Freemarker**:
+The following categories are available in **Settings 鈫?Editor 鈫?Color Scheme 鈫?Freemarker**:
 
 | Category                     | Example                     |
 |------------------------------|-----------------------------|
@@ -57,14 +57,14 @@ The following categories are available in **Settings → Editor → Color Scheme
 | Operator                     | `.`, `=`, `(`, `)`          |
 | Bad character                | Unexpected tokens           |
 
-Colors follow your active color scheme and are anchored to standard IntelliJ language defaults. Customize them under **Settings → Editor → Color Scheme → Freemarker**.
+Colors follow your active color scheme and are anchored to standard IntelliJ language defaults. Customize them under **Settings 鈫?Editor 鈫?Color Scheme 鈫?Freemarker**.
 
 ## Installation
 
 ### From ZIP (Manual)
 
-1. Download the `freemarker-plus-0.3.0.zip` from the releases.
-2. In IntelliJ IDEA, go to **Settings → Plugins → ⚙ → Install Plugin from Disk...**
+1. Download the `freemarker-plus-0.3.1.zip` from the releases.
+2. In IntelliJ IDEA, go to **Settings 鈫?Plugins 鈫?鈿?鈫?Install Plugin from Disk...**
 3. Select the downloaded ZIP file and restart the IDE.
 
 ### From Source
@@ -74,7 +74,7 @@ Colors follow your active color scheme and are anchored to standard IntelliJ lan
 ./gradlew buildPlugin
 
 # The distributable is at:
-# build/distributions/freemarker-plus-0.3.0.zip
+# build/distributions/freemarker-plus-0.3.1.zip
 ```
 
 To install from the built ZIP, follow the "From ZIP" instructions above.
@@ -103,29 +103,29 @@ To install from the built ZIP, follow the "From ZIP" instructions above.
 
 ```
 freemarker-plus/
-├── src/main/kotlin/com/freemarkerplus/
-│   ├── lang/
-│   │   ├── FreemarkerLanguage.kt       # Language definition (TemplateLanguage)
-│   │   └── FreemarkerFileType.kt       # File type for .ftl
-│   ├── lexer/
-│   │   ├── FreemarkerTokenType.kt      # Token type constants
-│   │   └── FreemarkerLexer.kt          # Hand-written lexer
-│   └── highlighting/
-│       ├── FreemarkerColors.kt          # TextAttributesKey definitions
-│       ├── FreemarkerSyntaxHighlighter.kt       # LayeredLexer highlighter
-│       ├── FreemarkerSyntaxHighlighterFactory.kt # Factory registration
-│       └── FreemarkerColorSettingsPage.kt       # Color scheme settings page
-├── src/main/resources/META-INF/
-│   └── plugin.xml                       # Plugin descriptor
-├── src/test/kotlin/com/freemarkerplus/
-│   ├── lexer/
-│   │   └── FreemarkerLexerTest.kt       # Lexer unit tests
-│   └── highlighting/
-│       └── FreemarkerSyntaxHighlighterTest.kt   # Highlighter integration tests
-├── examples/
-│   └── demo.ftl                         # Demo template covering all highlight scenarios
-├── build.gradle.kts
-└── settings.gradle.kts
+鈹溾攢鈹€ src/main/kotlin/com/freemarkerplus/
+鈹?  鈹溾攢鈹€ lang/
+鈹?  鈹?  鈹溾攢鈹€ FreemarkerLanguage.kt       # Language definition (TemplateLanguage)
+鈹?  鈹?  鈹斺攢鈹€ FreemarkerFileType.kt       # File type for .ftl
+鈹?  鈹溾攢鈹€ lexer/
+鈹?  鈹?  鈹溾攢鈹€ FreemarkerTokenType.kt      # Token type constants
+鈹?  鈹?  鈹斺攢鈹€ FreemarkerLexer.kt          # Hand-written lexer
+鈹?  鈹斺攢鈹€ highlighting/
+鈹?      鈹溾攢鈹€ FreemarkerColors.kt          # TextAttributesKey definitions
+鈹?      鈹溾攢鈹€ FreemarkerSyntaxHighlighter.kt       # LayeredLexer highlighter
+鈹?      鈹溾攢鈹€ FreemarkerSyntaxHighlighterFactory.kt # Factory registration
+鈹?      鈹斺攢鈹€ FreemarkerColorSettingsPage.kt       # Color scheme settings page
+鈹溾攢鈹€ src/main/resources/META-INF/
+鈹?  鈹斺攢鈹€ plugin.xml                       # Plugin descriptor
+鈹溾攢鈹€ src/test/kotlin/com/freemarkerplus/
+鈹?  鈹溾攢鈹€ lexer/
+鈹?  鈹?  鈹斺攢鈹€ FreemarkerLexerTest.kt       # Lexer unit tests
+鈹?  鈹斺攢鈹€ highlighting/
+鈹?      鈹斺攢鈹€ FreemarkerSyntaxHighlighterTest.kt   # Highlighter integration tests
+鈹溾攢鈹€ examples/
+鈹?  鈹斺攢鈹€ demo.ftl                         # Demo template covering all highlight scenarios
+鈹溾攢鈹€ build.gradle.kts
+鈹斺攢鈹€ settings.gradle.kts
 ```
 
 ## Demo
@@ -142,9 +142,9 @@ Open `examples/demo.ftl` in the sandbox IDE to see all highlighting features in 
 
 For HTML/JavaScript navigation, open `examples/js-navigation.ftl` (with `examples/app.js`):
 
-- `Ctrl+B` on `login` inside `onclick="login()"` → the `function login` in the `<script>` block
-- `Ctrl+B` on `logout` inside `onclick="logout()"` → `function logout` in `app.js`
-- `Ctrl+B` on `app.js` inside `<script src="app.js">` → the external file
+- `Ctrl+B` on `login` inside `onclick="login()"` 鈫?the `function login` in the `<script>` block
+- `Ctrl+B` on `logout` inside `onclick="logout()"` 鈫?`function logout` in `app.js`
+- `Ctrl+B` on `app.js` inside `<script src="app.js">` 鈫?the external file
 
 ## Toolchain
 

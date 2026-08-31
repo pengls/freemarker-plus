@@ -12,7 +12,6 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.impl.source.PsiFileImpl
 import com.intellij.psi.impl.source.PsiPlainTextFileImpl
 import com.intellij.psi.templateLanguages.TemplateLanguageFileViewProvider
-import com.intellij.psi.tree.IElementType
 
 /**
  * 模板语言双文件 view provider（官方 FTL 插件同款架构）：
@@ -44,15 +43,17 @@ class FtlFileViewProvider(
         } else if (lang == templateDataLanguage) {
             val definition = LanguageParserDefinitions.INSTANCE.forLanguage(lang)
             val psiFile = definition?.createFile(this) ?: PsiPlainTextFileImpl(this)
-            (psiFile as PsiFileImpl).setContentElementType(getContentElementType(lang)!!)
+            // 数据文件根内容元素 = TEMPLATE_DATA chameleon（懒展开为 HTML PSI）。
+            // 注意：不覆盖 TemplateLanguageFileViewProvider.getContentElementType
+            // （@ApiStatus.Experimental，验证器会告警）——平台创建文件只走 createFile，
+            // 这里直接设置即可（MultiplePsiFilesPerDocumentFileViewProvider.getPsi
+            // 仅调用 createFile，不查询该接口方法）。
+            (psiFile as PsiFileImpl).setContentElementType(FtlFileElementTypes.TEMPLATE_DATA)
             psiFile
         } else {
             null
         }
     }
-
-    override fun getContentElementType(language: Language): IElementType? =
-        if (language == templateDataLanguage) FtlFileElementTypes.TEMPLATE_DATA else null
 
     override fun cloneInner(copy: VirtualFile): FtlFileViewProvider =
         FtlFileViewProvider(manager, copy, false)

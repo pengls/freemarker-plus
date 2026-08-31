@@ -6,3 +6,17 @@ build/
 out/
 local.properties
 .worktrees/
+.kotlin/
+
+# IntelliJ test-framework debris dumped to the project root by `gradle test` runs
+/META-INF/
+/colorSchemes/
+/keymaps/
+/themes/
+/resources/
+/search/
+/data/
+/com/
+/idea/
+/liveTemplates/
+/*.xml

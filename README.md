@@ -18,6 +18,22 @@ An IntelliJ IDEA plugin that provides rich syntax highlighting and code navigati
 - **Code folding** — `<#if>/<#list>/<#macro>/<#function>/<#switch>` blocks.
 - **Breadcrumbs** and **rename** (Shift+F6).
 
+## HTML & JavaScript Navigation (Phase 2.5)
+
+Since Phase 2.5, the HTML/CSS/JS data area of a `.ftl` file is parsed into real HTML PSI
+(the platform template-language mechanism, same architecture as the official plugin):
+
+- **`onclick="login()"` → JS function** — event-handler attributes resolve to the `login`
+  function declared in the same file's `<script>` block, and to functions in external `.js`
+  files referenced via `<script src="app.js">`.
+- **`<script src="app.js">` → file** — Ctrl+B on the `src` path opens the JavaScript file.
+- **HTML navigation** — tags and attributes get the platform's native navigation/usage support.
+
+> Note: JavaScript features require the IDE's JavaScript support (bundled in IntelliJ IDEA
+> Ultimate and WebStorm). On Community Edition without the JS plugin, HTML navigation still
+> works; JS-specific navigation is simply unavailable.
+
+
 ## Supported File Types
 
 | Extension | Description                      |
@@ -47,7 +63,7 @@ Colors follow your active color scheme and are anchored to standard IntelliJ lan
 
 ### From ZIP (Manual)
 
-1. Download the `freemarker-plus-0.2.0.zip` from the releases.
+1. Download the `freemarker-plus-0.3.0.zip` from the releases.
 2. In IntelliJ IDEA, go to **Settings → Plugins → ⚙ → Install Plugin from Disk...**
 3. Select the downloaded ZIP file and restart the IDE.
 
@@ -58,7 +74,7 @@ Colors follow your active color scheme and are anchored to standard IntelliJ lan
 ./gradlew buildPlugin
 
 # The distributable is at:
-# build/distributions/freemarker-plus-0.2.0.zip
+# build/distributions/freemarker-plus-0.3.0.zip
 ```
 
 To install from the built ZIP, follow the "From ZIP" instructions above.
@@ -123,6 +139,12 @@ Open `examples/demo.ftl` in the sandbox IDE to see all highlighting features in 
 - HTML structure (tags, attributes, doctype)
 - Embedded CSS (inside `<style>`)
 - Embedded JavaScript (inside `<script>`)
+
+For HTML/JavaScript navigation, open `examples/js-navigation.ftl` (with `examples/app.js`):
+
+- `Ctrl+B` on `login` inside `onclick="login()"` → the `function login` in the `<script>` block
+- `Ctrl+B` on `logout` inside `onclick="logout()"` → `function logout` in `app.js`
+- `Ctrl+B` on `app.js` inside `<script src="app.js">` → the external file
 
 ## Toolchain
 

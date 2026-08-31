@@ -4,7 +4,8 @@
     <vendor>pengl</vendor>
     <description><![CDATA[
         Syntax highlighting for FreeMarker templates (.ftl, .ftlh, .ftlx) with HTML/CSS/JS support,
-        plus code navigation: go to declaration, find usages, structure view, folding, breadcrumbs, and rename.
+        plus code navigation: go to declaration, find usages, structure view, folding, breadcrumbs, rename,
+        and HTML/JavaScript navigation (event-handler attributes resolve to script functions, &lt;script src&gt; to files).
     ]]></description>
 
     <idea-version since-build="262" until-build="262.*"/>

@@ -42,6 +42,15 @@ kotlin {
     jvmToolchain(25)
 }
 
+intellijPlatform {
+    publishing {
+        // JetBrains Marketplace permanent token. Never hard-code it here — set the
+        // environment variable (e.g. $env:JETBRAINS_MARKETPLACE_TOKEN = "perm-...")
+        // before running `gradle.bat publishPlugin`.
+        token.set(System.getenv("JETBRAINS_MARKETPLACE_TOKEN"))
+    }
+}
+
 sourceSets {
     main {
         java.srcDir("src/main/gen")

@@ -16,6 +16,8 @@
     OPEN_TAG="<#" CLOSE_TAG="</#" OPEN_MACRO="<@" CLOSE_MACRO="</@"
     OPEN_INTERPOLATION="${" OPEN_LEGACY="#{" CLOSE_BRACE="}"
     TAG_END=">" COMMENT_START="<#--" COMMENT_END="-->"
+    QMARK="?" QQ="??"
+    GT=">" LT="<" GE=">=" LE="<="
     DOT="." COMMA="," ASSIGN_OP="=" LPAREN="(" RPAREN=")" SLASH="/"
     IDENT="regexp:[a-zA-Z_][a-zA-Z0-9_]*"
     STRING="regexp:('([^'\\]|\\.)*'|\"([^\"\\]|\\.)*\")"
@@ -35,8 +37,8 @@ COMMENT          ::= COMMENT_START COMMENT_END
 include_directive ::= OPEN_TAG INCLUDE string_literal TAG_END
 // <#import "a.ftl" as ns>
 import_directive  ::= OPEN_TAG IMPORT string_literal AS identifier TAG_END
-// <#assign name = expr> / <#local ...> / <#global ...>
-assign_directive  ::= OPEN_TAG (ASSIGN | LOCAL | GLOBAL) identifier ASSIGN_OP expression TAG_END
+// <#assign name = expr> / <#local ...> / <#global ...>（值可省略：块级 <#assign x>...</#assign>）
+assign_directive  ::= OPEN_TAG (ASSIGN | LOCAL | GLOBAL) identifier [ASSIGN_OP expression] TAG_END
 // <#macro name ...>
 macro_directive   ::= OPEN_TAG MACRO identifier attribute* TAG_END
 // <#function name ...>
@@ -48,8 +50,9 @@ list_directive    ::= OPEN_TAG LIST expression AS identifier TAG_END
 macro_call        ::= OPEN_MACRO identifier attribute* SLASH? TAG_END
                    | CLOSE_MACRO identifier TAG_END
 
-// 其余指令（if/elseif/else/switch/case/default/break/自定义指令）走通用规则
-generic_directive ::= OPEN_TAG directive_name attribute* TAG_END
+// 其余指令（if/elseif/else/switch/case/default/break/自定义指令）走通用规则。
+// 属性循环额外接受 AS identifier（<#escape x as html>）。
+generic_directive ::= OPEN_TAG directive_name (attribute | AS identifier)* TAG_END
                     | CLOSE_TAG directive_name TAG_END
 directive_name    ::= IF | ELSEIF | ELSE | SWITCH | CASE | DEFAULT | BREAK | MACRO | FUNCTION
                     | LIST | ASSIGN | LOCAL | GLOBAL | IMPORT | INCLUDE | IDENT
@@ -57,7 +60,12 @@ directive_name    ::= IF | ELSEIF | ELSE | SWITCH | CASE | DEFAULT | BREAK | MAC
 interpolation     ::= OPEN_INTERPOLATION expression CLOSE_BRACE
                     | OPEN_LEGACY expression CLOSE_BRACE
 
-expression        ::= primary (DOT primary)*
+// 表达式：primary 链（点访问 / ?内建函数（可带参数） / ??存在判断 / 括号内比较运算）。
+// 保持扁平结构：PRIMARY 仍是 EXPRESSION 的直接子节点（引用逻辑依赖 primaryList）。
+expression        ::= primary ( DOT primary
+                              | QMARK identifier [LPAREN expression (COMMA expression)* RPAREN]
+                              | QQ
+                              | (GT | LT | GE | LE) primary )*
 primary           ::= identifier
                     | string_literal
                     | NUMBER

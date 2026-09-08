@@ -43,6 +43,25 @@ class FtlStructureViewTest : BasePlatformTestCase() {
         assertEquals(0, regions.size)
     }
 
+    fun testFoldingRegionsForCompressNoparse() {
+        myFixture.configureByText(
+            "main.ftl",
+            "<#compress>\na\n</#compress>\n<#noparse>\nb\n</#noparse>",
+        )
+        val builder = FtlFoldingBuilder()
+        val regions = builder.buildFoldRegions(myFixture.file.node, myFixture.editor.document)
+        assertEquals(2, regions.size)
+    }
+
+    fun testFoldingRegionsForComment() {
+        myFixture.configureByText("main.ftl", "<#-- a long\nmulti-line comment -->\nbody")
+        val builder = FtlFoldingBuilder()
+        val regions = builder.buildFoldRegions(myFixture.file.node, myFixture.editor.document)
+        assertEquals(1, regions.size)
+        assertTrue(regions.single().range.substring(myFixture.file.text).startsWith("<#--"))
+        assertEquals("<#-- a long … -->", regions.single().placeholderText)
+    }
+
     fun testStructureViewCollectsDirectivesNotClosingTags() {
         myFixture.configureByText("main.ftl", "<#if x>\nhello\n</#if>\n<@greet/>")
         val model = FtlStructureViewModel(myFixture.file, myFixture.editor)

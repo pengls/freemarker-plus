@@ -1,6 +1,10 @@
 package com.freemarkerplus.navigation
 
+import com.freemarkerplus.psi.FtlAssignDirective
 import com.freemarkerplus.psi.FtlFunctionDirective
+import com.freemarkerplus.psi.FtlImportDirective
+import com.freemarkerplus.psi.FtlIncludeDirective
+import com.freemarkerplus.psi.FtlListDirective
 import com.freemarkerplus.psi.FtlMacroDirective
 import com.intellij.lang.findUsages.FindUsagesProvider
 import com.intellij.psi.PsiElement
@@ -16,9 +20,13 @@ class FtlFindUsagesProvider : FindUsagesProvider {
 
     override fun getHelpId(element: PsiElement): String = "reference.dialogs.findUsages"
 
-    override fun getType(element: PsiElement): String = when (element.parent) {
+    override fun getType(element: PsiElement): String = when (val parent = element.parent) {
         is FtlMacroDirective -> "Macro"
         is FtlFunctionDirective -> "Function"
+        is FtlImportDirective -> "Namespace"    // <#import ... as ns> 的别名
+        is FtlListDirective -> "Loop variable"  // <#list ... as x> 的循环变量
+        is FtlIncludeDirective -> "Include"
+        is FtlAssignDirective -> "Variable"     // assign/local/global 赋值名
         else -> "Variable"
     }
 

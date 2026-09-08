@@ -48,7 +48,7 @@ public class FtlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // OPEN_TAG (ASSIGN | LOCAL | GLOBAL) identifier ASSIGN_OP expression TAG_END
+  // OPEN_TAG (ASSIGN | LOCAL | GLOBAL) identifier [ASSIGN_OP expression] TAG_END
   public static boolean assign_directive(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "assign_directive")) return false;
     if (!nextTokenIs(builder_, OPEN_TAG)) return false;
@@ -57,8 +57,7 @@ public class FtlParser implements PsiParser, LightPsiParser {
     result_ = consumeToken(builder_, OPEN_TAG);
     result_ = result_ && assign_directive_1(builder_, level_ + 1);
     result_ = result_ && identifier(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, ASSIGN_OP);
-    result_ = result_ && expression(builder_, level_ + 1);
+    result_ = result_ && assign_directive_3(builder_, level_ + 1);
     result_ = result_ && consumeToken(builder_, TAG_END);
     exit_section_(builder_, marker_, ASSIGN_DIRECTIVE, result_);
     return result_;
@@ -71,6 +70,24 @@ public class FtlParser implements PsiParser, LightPsiParser {
     result_ = consumeToken(builder_, ASSIGN);
     if (!result_) result_ = consumeToken(builder_, LOCAL);
     if (!result_) result_ = consumeToken(builder_, GLOBAL);
+    return result_;
+  }
+
+  // [ASSIGN_OP expression]
+  private static boolean assign_directive_3(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "assign_directive_3")) return false;
+    assign_directive_3_0(builder_, level_ + 1);
+    return true;
+  }
+
+  // ASSIGN_OP expression
+  private static boolean assign_directive_3_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "assign_directive_3_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, ASSIGN_OP);
+    result_ = result_ && expression(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
     return result_;
   }
 
@@ -127,7 +144,10 @@ public class FtlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // primary (DOT primary)*
+  // primary ( DOT primary
+  //                               | QMARK identifier [LPAREN expression (COMMA expression)* RPAREN]
+  //                               | QQ
+  //                               | (GT | LT | GE | LE) primary )*
   public static boolean expression(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "expression")) return false;
     boolean result_;
@@ -138,7 +158,10 @@ public class FtlParser implements PsiParser, LightPsiParser {
     return result_;
   }
 
-  // (DOT primary)*
+  // ( DOT primary
+  //                               | QMARK identifier [LPAREN expression (COMMA expression)* RPAREN]
+  //                               | QQ
+  //                               | (GT | LT | GE | LE) primary )*
   private static boolean expression_1(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "expression_1")) return false;
     while (true) {
@@ -150,13 +173,105 @@ public class FtlParser implements PsiParser, LightPsiParser {
   }
 
   // DOT primary
+  //                               | QMARK identifier [LPAREN expression (COMMA expression)* RPAREN]
+  //                               | QQ
+  //                               | (GT | LT | GE | LE) primary
   private static boolean expression_1_0(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "expression_1_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = expression_1_0_0(builder_, level_ + 1);
+    if (!result_) result_ = expression_1_0_1(builder_, level_ + 1);
+    if (!result_) result_ = consumeToken(builder_, QQ);
+    if (!result_) result_ = expression_1_0_3(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // DOT primary
+  private static boolean expression_1_0_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "expression_1_0_0")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
     result_ = consumeToken(builder_, DOT);
     result_ = result_ && primary(builder_, level_ + 1);
     exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // QMARK identifier [LPAREN expression (COMMA expression)* RPAREN]
+  private static boolean expression_1_0_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "expression_1_0_1")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, QMARK);
+    result_ = result_ && identifier(builder_, level_ + 1);
+    result_ = result_ && expression_1_0_1_2(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // [LPAREN expression (COMMA expression)* RPAREN]
+  private static boolean expression_1_0_1_2(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "expression_1_0_1_2")) return false;
+    expression_1_0_1_2_0(builder_, level_ + 1);
+    return true;
+  }
+
+  // LPAREN expression (COMMA expression)* RPAREN
+  private static boolean expression_1_0_1_2_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "expression_1_0_1_2_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, LPAREN);
+    result_ = result_ && expression(builder_, level_ + 1);
+    result_ = result_ && expression_1_0_1_2_0_2(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, RPAREN);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // (COMMA expression)*
+  private static boolean expression_1_0_1_2_0_2(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "expression_1_0_1_2_0_2")) return false;
+    while (true) {
+      int pos_ = current_position_(builder_);
+      if (!expression_1_0_1_2_0_2_0(builder_, level_ + 1)) break;
+      if (!empty_element_parsed_guard_(builder_, "expression_1_0_1_2_0_2", pos_)) break;
+    }
+    return true;
+  }
+
+  // COMMA expression
+  private static boolean expression_1_0_1_2_0_2_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "expression_1_0_1_2_0_2_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, COMMA);
+    result_ = result_ && expression(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // (GT | LT | GE | LE) primary
+  private static boolean expression_1_0_3(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "expression_1_0_3")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = expression_1_0_3_0(builder_, level_ + 1);
+    result_ = result_ && primary(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // GT | LT | GE | LE
+  private static boolean expression_1_0_3_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "expression_1_0_3_0")) return false;
+    boolean result_;
+    result_ = consumeToken(builder_, GT);
+    if (!result_) result_ = consumeToken(builder_, LT);
+    if (!result_) result_ = consumeToken(builder_, GE);
+    if (!result_) result_ = consumeToken(builder_, LE);
     return result_;
   }
 
@@ -199,7 +314,7 @@ public class FtlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // OPEN_TAG directive_name attribute* TAG_END
+  // OPEN_TAG directive_name (attribute | AS identifier)* TAG_END
   //                     | CLOSE_TAG directive_name TAG_END
   public static boolean generic_directive(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "generic_directive")) return false;
@@ -212,7 +327,7 @@ public class FtlParser implements PsiParser, LightPsiParser {
     return result_;
   }
 
-  // OPEN_TAG directive_name attribute* TAG_END
+  // OPEN_TAG directive_name (attribute | AS identifier)* TAG_END
   private static boolean generic_directive_0(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "generic_directive_0")) return false;
     boolean result_;
@@ -225,15 +340,37 @@ public class FtlParser implements PsiParser, LightPsiParser {
     return result_;
   }
 
-  // attribute*
+  // (attribute | AS identifier)*
   private static boolean generic_directive_0_2(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "generic_directive_0_2")) return false;
     while (true) {
       int pos_ = current_position_(builder_);
-      if (!attribute(builder_, level_ + 1)) break;
+      if (!generic_directive_0_2_0(builder_, level_ + 1)) break;
       if (!empty_element_parsed_guard_(builder_, "generic_directive_0_2", pos_)) break;
     }
     return true;
+  }
+
+  // attribute | AS identifier
+  private static boolean generic_directive_0_2_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "generic_directive_0_2_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = attribute(builder_, level_ + 1);
+    if (!result_) result_ = generic_directive_0_2_0_1(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // AS identifier
+  private static boolean generic_directive_0_2_0_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "generic_directive_0_2_0_1")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, AS);
+    result_ = result_ && identifier(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
   }
 
   // CLOSE_TAG directive_name TAG_END

@@ -42,25 +42,31 @@ public interface FtlElementTypes {
   IElementType ELSE = new FtlTokenType("else");
   IElementType ELSEIF = new FtlTokenType("elseif");
   IElementType FUNCTION = new FtlTokenType("function");
+  IElementType GE = new FtlTokenType(">=");
   IElementType GLOBAL = new FtlTokenType("global");
+  IElementType GT = new FtlTokenType(">");
   IElementType IDENT = new FtlTokenType("IDENT");
   IElementType IF = new FtlTokenType("if");
   IElementType IMPORT = new FtlTokenType("import");
   IElementType INCLUDE = new FtlTokenType("include");
+  IElementType LE = new FtlTokenType("<=");
   IElementType LIST = new FtlTokenType("list");
   IElementType LOCAL = new FtlTokenType("local");
   IElementType LPAREN = new FtlTokenType("(");
+  IElementType LT = new FtlTokenType("<");
   IElementType MACRO = new FtlTokenType("macro");
   IElementType NUMBER = new FtlTokenType("NUMBER");
   IElementType OPEN_INTERPOLATION = new FtlTokenType("${");
   IElementType OPEN_LEGACY = new FtlTokenType("#{");
   IElementType OPEN_MACRO = new FtlTokenType("<@");
   IElementType OPEN_TAG = new FtlTokenType("<#");
+  IElementType QMARK = new FtlTokenType("?");
+  IElementType QQ = new FtlTokenType("??");
   IElementType RPAREN = new FtlTokenType(")");
   IElementType SLASH = new FtlTokenType("/");
   IElementType STRING = new FtlTokenType("STRING");
   IElementType SWITCH = new FtlTokenType("switch");
-  IElementType TAG_END = new FtlTokenType(">");
+  IElementType TAG_END = new FtlTokenType("TAG_END");
   IElementType TEMPLATE_TEXT = new FtlTokenType("TEMPLATE_TEXT");
 
   class Factory {

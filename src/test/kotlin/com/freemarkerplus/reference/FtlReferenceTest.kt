@@ -192,4 +192,69 @@ class FtlReferenceTest : BasePlatformTestCase() {
         assertTrue(target.parent is FtlMacroDirective)
         assertEquals(other.virtualFile, target.containingFile.virtualFile)
     }
+
+    fun testMacroParameterResolvesFromBody() {
+        myFixture.configureByText("main.ftl", "<#macro greet name>Hello \${name}</#macro>")
+        // 宏体内的 ${name} → 解析到宏参数 name
+        myFixture.editor.caretModel.moveToOffset(myFixture.file.text.lastIndexOf("name"))
+        val ref = myFixture.file.findReferenceAt(myFixture.editor.caretModel.offset)
+        assertNotNull(ref)
+        val target = ref!!.resolve()
+        assertNotNull(target)
+        assertEquals("name", target!!.text)
+        assertTrue(PsiTreeUtil.getParentOfType(target, FtlMacroDirective::class.java) != null)
+    }
+
+    fun testMacroParameterWithDefaultResolves() {
+        myFixture.configureByText("main.ftl", "<#macro box cols=3>\${cols}</#macro>")
+        myFixture.editor.caretModel.moveToOffset(myFixture.file.text.lastIndexOf("cols"))
+        val ref = myFixture.file.findReferenceAt(myFixture.editor.caretModel.offset)
+        assertNotNull(ref)
+        val target = ref!!.resolve()
+        assertNotNull(target)
+        assertEquals("cols", target!!.text)
+    }
+
+    fun testNamespaceResolvesMultiLevelImportPath() {
+        val lib = myFixture.addFileToProject("partials/lib.ftl", "<#macro hello>hi</#macro>")
+        myFixture.configureByText("main.ftl", "<#import \"partials/lib.ftl\" as lib>\n\${lib.hello}")
+        myFixture.editor.caretModel.moveToOffset(myFixture.file.text.indexOf("lib.hello") + 1)
+        val ref = myFixture.file.findReferenceAt(myFixture.editor.caretModel.offset)
+        assertNotNull(ref)
+        val target = ref!!.resolve()
+        assertNotNull(target)
+        assertEquals("hello", target!!.text)
+        assertTrue(target.parent is FtlMacroDirective)
+        assertEquals(lib.virtualFile, target.containingFile.virtualFile)
+    }
+
+    fun testRootSegmentBeforeBuiltinResolves() {
+        // 注意：变量名避开 TAG 态关键字（如 list/assign），关键字抢占 IDENT 是已知边缘 case
+        myFixture.configureByText("main.ftl", "<#assign items = 1>\n\${items?size}")
+        myFixture.editor.caretModel.moveToOffset(myFixture.file.text.indexOf("items", myFixture.file.text.indexOf("\${")))
+        val ref = myFixture.file.findReferenceAt(myFixture.editor.caretModel.offset)
+        assertNotNull(ref)
+        val target = ref!!.resolve()
+        assertNotNull(target)
+        assertEquals("items", target!!.text)
+        assertTrue(target.parent is FtlAssignDirective)
+    }
+
+    fun testBuiltinNameIsNotVariableReference() {
+        myFixture.configureByText("main.ftl", "<#assign items = 1>\n\${items?size}")
+        // ? 后的内建函数名不是变量：不挂变量引用，避免误标红/误跳转
+        myFixture.editor.caretModel.moveToOffset(myFixture.file.text.indexOf("size", myFixture.file.text.indexOf("\${")))
+        assertNull(myFixture.file.findReferenceAt(myFixture.editor.caretModel.offset))
+    }
+
+    fun testExistsOperatorRootResolves() {
+        myFixture.configureByText("main.ftl", "<#assign user = 1>\n<#if user??>")
+        myFixture.editor.caretModel.moveToOffset(myFixture.file.text.indexOf("user", myFixture.file.text.indexOf("<#if ")))
+        val ref = myFixture.file.findReferenceAt(myFixture.editor.caretModel.offset)
+        assertNotNull(ref)
+        val target = ref!!.resolve()
+        assertNotNull(target)
+        assertEquals("user", target!!.text)
+        assertTrue(target.parent is FtlAssignDirective)
+    }
 }

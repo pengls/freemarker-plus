@@ -22,20 +22,30 @@ object FtlPsiUtil {
         return result
     }
 
-    // 收集指定名字的变量声明（assign/local/global 赋值名、list 的 as 循环变量）
+    // 收集指定名字的变量声明（assign/local/global 赋值名、list 的 as 循环变量、
+    // macro/function 的参数名——宏体内的 ${param} 由此可跳转/查找引用/重命名）。
     fun findVariableDeclarations(file: FtlFile, name: String): List<PsiElement> {
         val result = mutableListOf<PsiElement>()
+        fun add(ident: PsiElement?) {
+            if (ident is FtlIdentifier && ident.text == name) result.add(ident)
+        }
         PsiTreeUtil.processElements(file) { el ->
-            val ident = when (el) {
-                is FtlAssignDirective -> el.identifier  // assign/local/global 赋值名
-                is FtlListDirective -> el.identifier    // list 的 as 循环变量
-                else -> null
+            when (el) {
+                is FtlAssignDirective -> add(el.identifier)  // assign/local/global 赋值名
+                is FtlListDirective -> add(el.identifier)    // list 的 as 循环变量
+                is FtlMacroDirective -> el.attributeList.forEach { add(it.declaredParamName()) }
+                is FtlFunctionDirective -> el.attributeList.forEach { add(it.declaredParamName()) }
+                else -> {}
             }
-            if (ident != null && ident.text == name) result.add(ident)
             true
         }
         return result
     }
+
+    // 参数声明名：具名默认值（a=1）取 attribute 的直接 identifier；
+    // 位置参数（a）是 expression（primary→identifier），从表达式子树取首个标识符。
+    private fun FtlAttribute.declaredParamName(): FtlIdentifier? =
+        identifier ?: expression.let { PsiTreeUtil.findChildOfType(it, FtlIdentifier::class.java) }
 
     // 生成一个携带指定文本的独立 FtlIdentifier：解析一个哑 <#macro name> 并取其中的
     // name 标识符。重命名（setName / FtlIdentifierManipulator）用它作为替换元素，

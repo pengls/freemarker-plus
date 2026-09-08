@@ -10,6 +10,10 @@ import static com.freemarkerplus.psi.FtlElementTypes.*;
 %%
 
 %{
+  // 指令内括号深度：> / < 只在括号内才是比较运算符，括号外 > 是指令结束符。
+  // 每次从 YYINITIAL 进入 TAG 态时清零（见各定界符动作）。
+  private int parenDepth = 0;
+
   public _FtlLexer() {
     this((java.io.Reader)null);
   }
@@ -38,10 +42,10 @@ TEMPLATE_TEXT=([^<#$]|\$[^{]|\#[^{]|<[^#@/]|<\/[^#@])+
 // Template data: runs of data text (HTML/CSS/JS) that stop at FTL delimiters.
 <YYINITIAL> {
   "<#--"                  { yybegin(COMMENT); return COMMENT_START; }
-  "<#"                    { yybegin(TAG); return OPEN_TAG; }
-  "</#"                   { yybegin(TAG); return CLOSE_TAG; }
-  "<@"                    { yybegin(TAG); return OPEN_MACRO; }
-  "</@"                   { yybegin(TAG); return CLOSE_MACRO; }
+  "<#"                    { yybegin(TAG); parenDepth = 0; return OPEN_TAG; }
+  "</#"                   { yybegin(TAG); parenDepth = 0; return CLOSE_TAG; }
+  "<@"                    { yybegin(TAG); parenDepth = 0; return OPEN_MACRO; }
+  "</@"                   { yybegin(TAG); parenDepth = 0; return CLOSE_MACRO; }
   "${"                    { yybegin(INTERPOLATION); return OPEN_INTERPOLATION; }
   "#{"                    { yybegin(INTERPOLATION); return OPEN_LEGACY; }
   {TEMPLATE_TEXT}          { return TEMPLATE_TEXT; }
@@ -66,12 +70,17 @@ TEMPLATE_TEXT=([^<#$]|\$[^{]|\#[^{]|<[^#@/]|<\/[^#@])+
   "default"               { return DEFAULT; }
   "break"                 { return BREAK; }
   "as"                    { return AS; }
-  ">"                     { yybegin(YYINITIAL); return TAG_END; }
+  "??"                    { return QQ; }
+  "?"                     { return QMARK; }
+  ">="                    { if (parenDepth > 0) { return GE; } yybegin(YYINITIAL); parenDepth = 0; yypushback(1); return TAG_END; }
+  "<="                    { if (parenDepth > 0) { return LE; } return BAD_CHARACTER; }
+  ">"                     { if (parenDepth > 0) { return GT; } yybegin(YYINITIAL); parenDepth = 0; return TAG_END; }
+  "<"                     { if (parenDepth > 0) { return LT; } return BAD_CHARACTER; }
   "."                     { return DOT; }
   ","                     { return COMMA; }
   "="                     { return ASSIGN_OP; }
-  "("                     { return LPAREN; }
-  ")"                     { return RPAREN; }
+  "("                     { parenDepth++; return LPAREN; }
+  ")"                     { if (parenDepth > 0) { parenDepth--; } return RPAREN; }
   "/"                     { return SLASH; }
   {IDENT}                 { return IDENT; }
   {STRING}                { return STRING; }
@@ -82,6 +91,12 @@ TEMPLATE_TEXT=([^<#$]|\$[^{]|\#[^{]|<[^#@/]|<\/[^#@])+
 <INTERPOLATION> {
   {WHITE_SPACE}           { return WHITE_SPACE; }
   "}"                     { yybegin(YYINITIAL); return CLOSE_BRACE; }
+  "??"                    { return QQ; }
+  "?"                     { return QMARK; }
+  ">="                    { return GE; }
+  "<="                    { return LE; }
+  ">"                     { return GT; }
+  "<"                     { return LT; }
   "."                     { return DOT; }
   ","                     { return COMMA; }
   "="                     { return ASSIGN_OP; }

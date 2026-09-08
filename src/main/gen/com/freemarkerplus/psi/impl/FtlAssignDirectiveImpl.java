@@ -28,9 +28,9 @@ public class FtlAssignDirectiveImpl extends ASTWrapperPsiElement implements FtlA
   }
 
   @Override
-  @NotNull
+  @Nullable
   public FtlExpression getExpression() {
-    return findNotNullChildByClass(FtlExpression.class);
+    return findChildByClass(FtlExpression.class);
   }
 
   @Override

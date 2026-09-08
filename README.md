@@ -5,6 +5,7 @@ An IntelliJ IDEA plugin that provides rich syntax highlighting and code navigati
 ## Features
 
 - **FreeMarker syntax highlighting** — comments, directives (`<#if>`, `<#list>`, `<#assign>`, ...), macro calls (`<@...>`), interpolation (`${...}`), strings, numbers, keywords, and operators.
+- **Expression support** — `?builtin` functions (with arguments, e.g. `${list?size}`, `${x?string("a","b")}`), `??` existence checks, parenthesized comparisons in directives (`<#if (a > b)>`), comparisons in interpolations, and block-level `<#assign x>...</#assign>`.
 - **HTML highlighting** — full HTML tag, attribute, and content highlighting via IntelliJ's built-in HTML lexer.
 - **Embedded CSS highlighting** — CSS code inside `<style>` blocks is highlighted with the platform CSS lexer.
 - **Embedded JavaScript highlighting** — JavaScript code inside `<script>` blocks is highlighted with the platform JS lexer.
@@ -62,7 +63,7 @@ Colors follow your active color scheme and are anchored to standard IntelliJ lan
 
 ### From ZIP (Manual)
 
-1. Download the `freemarker-plus-0.3.2.zip` from the releases.
+1. Download the `freemarker-plus-0.4.0.zip` from the releases.
 2. In IntelliJ IDEA, go to **Settings → Plugins → ⚙ → Install Plugin from Disk...**
 3. Select the downloaded ZIP file and restart the IDE.
 
@@ -73,7 +74,7 @@ Colors follow your active color scheme and are anchored to standard IntelliJ lan
 ./gradlew buildPlugin
 
 # The distributable is at:
-# build/distributions/freemarker-plus-0.3.2.zip
+# build/distributions/freemarker-plus-0.4.0.zip
 ```
 
 To install from the built ZIP, follow the "From ZIP" instructions above.

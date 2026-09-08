@@ -52,17 +52,17 @@ Phase 2 目标：为 `.ftl` 文件提供**代码导航（Code Navigation）**能
 | `lang.findUsagesProvider` (FTL) | `FtlFindUsagesProvider` | 查找引用 | ✅ |
 | `findUsagesHandlerFactory` | `FtlFindUsagesHandlerFactory` | 查找引用处理器 | ✅ |
 | `definitionsSearch` | `FtlDefinitionSearcher` | 定义搜索（跨文件） | ✅ |
-| `methodReferencesSearch` | `FtlMethodUsageSearcher` | 方法引用搜索（跨文件） | ✅ |
+| `referencesSearch` | `FtlMethodUsageSearcher` | 引用搜索（跨文件） | ✅（修订 2026-09-08：实现注册的是通用 `referencesSearch`，非原计划的 `methodReferencesSearch`） |
 | `lang.psiStructureViewFactory` (FTL) | `FtlStructureViewBuilderProvider` | 结构视图 | ✅ |
 | `lang.foldingBuilder` (FTL) | `FtlFoldingBuilder` | 代码折叠 | ✅ |
 | `breadcrumbsInfoProvider` | `FtlBreadcrumbsInfoProvider` | 面包屑 | ✅ |
 | `renamePsiElementProcessor` | `FtlRenameProcessor` | 重命名 | ✅ |
-| `renameHandler` | `FtlPropertyRenameHandler` | 属性重命名 | ✅（基础） |
+| `renameHandler` | `FtlPropertyRenameHandler` | 属性重命名 | ❌（修订 2026-09-08：未实现——声明重命名已由 `FtlIdentifierMixin`（`PsiNameIdentifierOwner`）+ 平台默认 rename 流程覆盖，`FtlRenameProcessor` 仅负责拒绝 import 别名改名） |
 | `fileBasedIndex` | `FtlFileIndex` | 文件索引（宏/变量声明） | ✅（跨文件导航） |
 | `gotoTargetRendererProvider` | `FtlElementCellRenderer` | 跳转目标渲染 | ⭕ 可选 |
 | `lang.elementManipulator` (`FtlMacro`) | `FtlMacroManipulator` | 宏操作 | ⭕ 可选 |
 | `customPropertyScopeProvider` | `FtlPropertyScopeProvider` | 属性作用域 | ❌ 暂缓 |
-| `lang.parserDefinition` (FTL]) | `FtlSquareParserDefinition` | 方括号 `[#..]` 方言 | ❌ 不做 |
+| `lang.parserDefinition` (FTL) | `FtlSquareParserDefinition` | 方括号 `[#..]` 方言 | ❌ 不做 |
 | `completion.contributor` | `FtlCompletionContributor` | 代码补全 | ❌ Phase 3 |
 | `localInspection` (References/Types/Calls…) | `Ftl*Inspection` | 语义检查（未解析引用红色波浪线等） | ❌ Phase 3 |
 | `lang.documentationProvider` | `FtlDocumentationProvider` | 文档 | ❌ Phase 3 |
@@ -133,7 +133,7 @@ Phase 2 目标：为 `.ftl` 文件提供**代码导航（Code Navigation）**能
 
 ## 5. 架构与组件
 
-语言 ID：`FTL`（沿用 Phase 1，与官方插件一致）。
+语言 ID：`FreemarkerPlus`（修订 2026-09-08：Phase 1/2 原规划为 `FTL`，实现时调整为 `FreemarkerPlus`，避免与官方插件语言 ID 冲突，见 commit `95845ef`）。
 
 | 组件 | 基类/接口 | 职责 |
 |---|---|---|
@@ -320,18 +320,18 @@ string_literal    ::= STRING_LITERAL
 在 Phase 1 的 `plugin.xml` 上新增（全部 `defaultExtensionNs="com.intellij"`）：
 
 ```xml
-<lang.parserDefinition language="FTL"
+<lang.parserDefinition language="FreemarkerPlus"
                        implementationClass="com.freemarkerplus.psi.FtlParserDefinition"/>
-<psi.referenceContributor language="FTL"
+<psi.referenceContributor language="FreemarkerPlus"
                           implementation="com.freemarkerplus.reference.FtlReferenceContributor"/>
-<lang.findUsagesProvider language="FTL"
+<lang.findUsagesProvider language="FreemarkerPlus"
                          implementationClass="com.freemarkerplus.navigation.FtlFindUsagesProvider"/>
 <findUsagesHandlerFactory implementation="com.freemarkerplus.navigation.FtlFindUsagesHandlerFactory"/>
 <definitionsSearch implementation="com.freemarkerplus.navigation.FtlDefinitionSearcher"/>
-<methodReferencesSearch implementation="com.freemarkerplus.navigation.FtlMethodUsageSearcher"/>
-<lang.psiStructureViewFactory language="FTL"
+<referencesSearch implementation="com.freemarkerplus.navigation.FtlMethodUsageSearcher"/>
+<lang.psiStructureViewFactory language="FreemarkerPlus"
                               implementationClass="com.freemarkerplus.navigation.FtlStructureViewBuilderProvider"/>
-<lang.foldingBuilder language="FTL"
+<lang.foldingBuilder language="FreemarkerPlus"
                      implementationClass="com.freemarkerplus.navigation.FtlFoldingBuilder"/>
 <breadcrumbsInfoProvider implementation="com.freemarkerplus.navigation.FtlBreadcrumbsInfoProvider"/>
 <renamePsiElementProcessor implementation="com.freemarkerplus.navigation.FtlRenameProcessor"/>
@@ -341,6 +341,8 @@ string_literal    ::= STRING_LITERAL
 ```
 
 > `fileType`（`FreemarkerFileType`）沿用 Phase 1，无需改动（语言与扩展名不变）。
+>
+> 修订 2026-09-08：以上片段已按实现对齐（`language="FreemarkerPlus"`、`referencesSearch`）；实现另注册了 `lang.namesValidator`（`FtlNamesValidator`）与 `lang.elementManipulator`（`FtlIdentifier` / `FtlIdentifierManipulator`）。完整清单以 `src/main/resources/META-INF/plugin.xml` 为准。
 
 ---
 
@@ -361,3 +363,15 @@ string_literal    ::= STRING_LITERAL
 - Java 数据模型解析（`FtlDataModelVariable`）、Spring/Web/i18n 集成
 - 格式化、注释器、文档 provider
 - 方括号 `[#..]` 方言
+
+---
+
+## 14. 修订记录
+
+### 2026-09-08 实现对齐修订（对照 `src/main/resources/META-INF/plugin.xml` 与实际代码）
+
+1. **语言 ID**：规划为 `FTL` → 实现为 `FreemarkerPlus`（避免与官方插件语言 ID 冲突，commit `95845ef`）。§5 与 §11 片段已同步更正。
+2. **§2.2 / §11 引用搜索扩展点**：实现注册的是通用 `referencesSearch`（`FtlMethodUsageSearcher`），非规划中的 `methodReferencesSearch`。
+3. **§2.2 `renameHandler`**：未实现。声明重命名由 `FtlIdentifierMixin`（`PsiNameIdentifierOwner`）+ 平台默认 rename 流程覆盖，`FtlRenameProcessor` 仅负责拒绝 import 别名改名。
+4. **§11 片段与实际注册的差异**：实现额外注册了 `lang.namesValidator` 与 `lang.elementManipulator`（`FtlIdentifier`）。
+5. **§4.2「扁平 PSI」决策已被 Phase 2.5 取代**：已迁移至官方模板语言机制的双文件 view provider（数据区为真实 HTML/XML PSI，chameleon 懒展开），见 `docs/superpowers/plans/2026-08-30-freemarker-plus-phase25-spike-notes.md` 与 commit `03e20a4`。

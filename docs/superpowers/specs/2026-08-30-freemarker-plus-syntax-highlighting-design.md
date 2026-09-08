@@ -67,7 +67,7 @@
 | `FreemarkerSyntaxHighlighterFactory` | `SyntaxHighlighterFactory` | 工厂，注册到扩展点 |
 | `FreemarkerColorSettingsPage` | `ColorSettingsPage` | 默认色、设置页分组、预览样例 |
 
-语言 ID：`FTL`（与官方插件一致，便于用户认知迁移）。
+语言 ID：`FreemarkerPlus`（修订 2026-09-08：原设计为 `FTL`（与官方插件一致）；实现时调整为 `FreemarkerPlus`，避免与官方插件语言 ID 冲突，见 commit `95845ef`）。
 
 ### 4.1 数据流
 
@@ -192,3 +192,12 @@
   - PSI 解析器 → 补全、跳转、折叠、结构视图、语义报错、格式化
   - `.ftlh` / `.ftlx` 文件类型
   - Freemarker 版本 / 数据语言按文件配置
+
+---
+
+## 13. 修订记录
+
+### 2026-09-08 实现对齐修订
+
+- **语言 ID**：原设计为 `FTL`（与官方插件一致），实现时调整为 `FreemarkerPlus`（避免与官方插件语言 ID 冲突，commit `95845ef`）。
+- `.ftlh` / `.ftlx` 文件类型支持已随 Phase 1 后续迭代落地（超出本 spec 原范围）。

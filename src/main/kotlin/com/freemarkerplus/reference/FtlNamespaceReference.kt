@@ -8,7 +8,6 @@ import com.freemarkerplus.psi.FtlPsiUtil
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
-import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiPolyVariantReferenceBase
 import com.intellij.psi.ResolveResult
 import com.intellij.psi.util.PsiTreeUtil
@@ -45,9 +44,10 @@ class FtlNamespaceReference(element: PsiElement, rangeInElement: TextRange) :
 
     private fun findImportedFile(file: FtlFile, namespace: String): FtlFile? {
         val import = findImportDirective(file, namespace) ?: return null
-        val path = import.stringLiteral.text.trim('\'', '"')
-        val vf = file.virtualFile?.parent?.findChild(path) ?: return null
-        return PsiManager.getInstance(file.project).findFile(vf) as? FtlFile
+        // 与 #include 导航同源：复用 import 字符串字面量上的 FtlFileReference
+        // （FileReferenceSet 按 '/' 分段解析，支持多级相对路径），避免两套路径解析漂移。
+        val fileRef = import.stringLiteral.references.firstOrNull() as? FtlFileReference ?: return null
+        return fileRef.resolve() as? FtlFile
     }
 
     override fun getVariants(): Array<Any> = emptyArray()

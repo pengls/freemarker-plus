@@ -29,6 +29,18 @@ public class FtlExpressionImpl extends ASTWrapperPsiElement implements FtlExpres
 
   @Override
   @NotNull
+  public List<FtlExpression> getExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, FtlExpression.class);
+  }
+
+  @Override
+  @NotNull
+  public List<FtlIdentifier> getIdentifierList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, FtlIdentifier.class);
+  }
+
+  @Override
+  @NotNull
   public List<FtlPrimary> getPrimaryList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, FtlPrimary.class);
   }

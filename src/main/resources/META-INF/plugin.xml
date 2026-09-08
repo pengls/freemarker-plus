@@ -46,5 +46,7 @@
         <renamePsiElementProcessor implementation="com.freemarkerplus.navigation.FtlRenameProcessor"/>
         <lang.namesValidator language="FreemarkerPlus"
                              implementationClass="com.freemarkerplus.navigation.FtlNamesValidator"/>
+        <lang.commenter language="FreemarkerPlus"
+                        implementationClass="com.freemarkerplus.lang.FreemarkerCommenter"/>
     </extensions>
 </idea-plugin>

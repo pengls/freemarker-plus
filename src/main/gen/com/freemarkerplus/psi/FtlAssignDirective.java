@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface FtlAssignDirective extends PsiElement {
 
-  @NotNull
+  @Nullable
   FtlExpression getExpression();
 
   @NotNull

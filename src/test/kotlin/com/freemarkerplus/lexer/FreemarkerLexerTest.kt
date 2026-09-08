@@ -77,9 +77,83 @@ class FreemarkerLexerTest : BasePlatformTestCase() {
         assertEquals(listOf(FreemarkerTokenTypes.COMMENT), types(text))
     }
 
-    fun testEscapedInterpolationIsData() {
+    fun testBackslashBeforeInterpolationIsPlainText() {
+        // FreeMarker 语义：模板文本中 `\` 不是转义符，\${x} = 文本 `\` + 插值 ${x}。
+        // 高亮与解析两侧行为一致：反斜杠归数据区，${x} 照常成插值。
         val text = "\\\${x}"
-        assertEquals(listOf(FreemarkerTokenTypes.TEMPLATE_DATA), types(text))
+        assertEquals(
+            listOf(
+                FreemarkerTokenTypes.TEMPLATE_DATA,
+                FreemarkerTokenTypes.INTERPOLATION,
+                FreemarkerTokenTypes.IDENTIFIER,
+                FreemarkerTokenTypes.INTERPOLATION
+            ),
+            types(text)
+        )
+    }
+
+    fun testLegacyInterpolation() {
+        val text = "#{x}"
+        assertEquals(
+            listOf(
+                FreemarkerTokenTypes.INTERPOLATION,
+                FreemarkerTokenTypes.IDENTIFIER,
+                FreemarkerTokenTypes.INTERPOLATION
+            ),
+            types(text)
+        )
+    }
+
+    fun testParenComparisonInTag() {
+        // 括号内的 > 是比较运算符，不结束指令；括号外的 > 结束指令
+        val text = "<#if (a > b)>"
+        assertEquals(
+            listOf(
+                FreemarkerTokenTypes.INTERPOLATION,   // <#
+                FreemarkerTokenTypes.DIRECTIVE_NAME,  // if
+                TokenType.WHITE_SPACE,
+                FreemarkerTokenTypes.OPERATOR,        // (
+                FreemarkerTokenTypes.IDENTIFIER,      // a
+                TokenType.WHITE_SPACE,
+                FreemarkerTokenTypes.OPERATOR,        // >
+                TokenType.WHITE_SPACE,
+                FreemarkerTokenTypes.IDENTIFIER,      // b
+                FreemarkerTokenTypes.OPERATOR,        // )
+                FreemarkerTokenTypes.INTERPOLATION    // >
+            ),
+            types(text)
+        )
+    }
+
+    fun testInterpolationComparison() {
+        val text = "\${a > b}"
+        assertEquals(
+            listOf(
+                FreemarkerTokenTypes.INTERPOLATION,   // ${
+                FreemarkerTokenTypes.IDENTIFIER,      // a
+                TokenType.WHITE_SPACE,
+                FreemarkerTokenTypes.OPERATOR,        // >
+                TokenType.WHITE_SPACE,
+                FreemarkerTokenTypes.IDENTIFIER,      // b
+                FreemarkerTokenTypes.INTERPOLATION    // }
+            ),
+            types(text)
+        )
+    }
+
+    fun testBuiltinInInterpolationTokens() {
+        // ? 内建：高亮层一直按 OPERATOR 处理，回归确认仍正常
+        val text = "\${x?size}"
+        assertEquals(
+            listOf(
+                FreemarkerTokenTypes.INTERPOLATION,   // ${
+                FreemarkerTokenTypes.IDENTIFIER,      // x
+                FreemarkerTokenTypes.OPERATOR,        // ?
+                FreemarkerTokenTypes.IDENTIFIER,      // size
+                FreemarkerTokenTypes.INTERPOLATION    // }
+            ),
+            types(text)
+        )
     }
 
     fun testPlainHtmlIsData() {

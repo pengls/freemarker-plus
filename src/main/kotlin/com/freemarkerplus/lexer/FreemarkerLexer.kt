@@ -18,6 +18,10 @@ class FreemarkerLexer : LexerBase() {
     private var mode = Mode.DATA
     private var expectName = false
 
+    // 指令内括号深度：括号内的 > 是比较运算符（OPERATOR），括号外的 > 结束指令。
+    // 每次从 DATA 进入 TAG 态时清零，与解析侧 _FtlLexer 保持一致。
+    private var tagParenDepth = 0
+
     override fun start(buffer: CharSequence, startOffset: Int, endOffset: Int, initialState: Int) {
         this.buffer = buffer
         this.endOffset = endOffset
@@ -74,6 +78,7 @@ class FreemarkerLexer : LexerBase() {
                 tokenEnd = pos
                 mode = Mode.TAG
                 expectName = true
+                tagParenDepth = 0
             }
             startsWith(pos, "</@") -> {
                 tokenType = FreemarkerTokenTypes.INTERPOLATION
@@ -81,6 +86,7 @@ class FreemarkerLexer : LexerBase() {
                 tokenEnd = pos
                 mode = Mode.TAG
                 expectName = true
+                tagParenDepth = 0
             }
             startsWith(pos, "<#") -> {
                 tokenType = FreemarkerTokenTypes.INTERPOLATION
@@ -88,6 +94,7 @@ class FreemarkerLexer : LexerBase() {
                 tokenEnd = pos
                 mode = Mode.TAG
                 expectName = true
+                tagParenDepth = 0
             }
             startsWith(pos, "<@") -> {
                 tokenType = FreemarkerTokenTypes.INTERPOLATION
@@ -95,8 +102,15 @@ class FreemarkerLexer : LexerBase() {
                 tokenEnd = pos
                 mode = Mode.TAG
                 expectName = true
+                tagParenDepth = 0
             }
             startsWith(pos, "\${") -> {
+                tokenType = FreemarkerTokenTypes.INTERPOLATION
+                pos += 2
+                tokenEnd = pos
+                mode = Mode.INTERPOLATION
+            }
+            startsWith(pos, "#{") -> {
                 tokenType = FreemarkerTokenTypes.INTERPOLATION
                 pos += 2
                 tokenEnd = pos
@@ -108,11 +122,8 @@ class FreemarkerLexer : LexerBase() {
 
     private fun lexPlainData() {
         while (pos < endOffset) {
-            val c = buffer[pos]
-            if (c == '\\' && pos + 1 < endOffset && (buffer[pos + 1] == '$' || buffer[pos + 1] == '<')) {
-                pos += 2
-                continue
-            }
+            // 注意：FreeMarker 模板文本中 `\` 不是转义符（\$、\< 无特殊含义），
+            // 这里不做转义处理，与解析侧 _FtlLexer 及真实 FTL 语义保持一致。
             if (isFreemarkerStart(pos)) break
             if (startsWithIgnoreCase(pos, "<style") || startsWithIgnoreCase(pos, "<script")) break
             pos++
@@ -186,13 +197,23 @@ class FreemarkerLexer : LexerBase() {
     }
 
     private fun advanceTag() {
-        if (buffer[pos] == '>') {
+        val c = buffer[pos]
+        if (c == '>') {
+            if (tagParenDepth > 0) {
+                // 括号内的 > 是比较运算符，不结束指令
+                pos++
+                tokenType = FreemarkerTokenTypes.OPERATOR
+                tokenEnd = pos
+                return
+            }
             tokenType = FreemarkerTokenTypes.INTERPOLATION
             pos++
             tokenEnd = pos
             mode = Mode.DATA
             return
         }
+        if (c == '(') tagParenDepth++
+        if (c == ')' && tagParenDepth > 0) tagParenDepth--
         if (expectName) {
             if (buffer[pos].isWhitespace()) {
                 lexWhitespace()
@@ -270,8 +291,8 @@ class FreemarkerLexer : LexerBase() {
     }
 
     private fun isFreemarkerStart(offset: Int): Boolean =
-        startsWith(offset, "\${") || startsWith(offset, "<#") || startsWith(offset, "<@") ||
-        startsWith(offset, "</#") || startsWith(offset, "</@")
+        startsWith(offset, "\${") || startsWith(offset, "#{") || startsWith(offset, "<#") ||
+        startsWith(offset, "<@") || startsWith(offset, "</#") || startsWith(offset, "</@")
 
     private fun startsWith(offset: Int, text: String): Boolean {
         if (offset + text.length > endOffset) return false

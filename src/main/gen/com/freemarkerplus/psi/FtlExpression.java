@@ -8,6 +8,12 @@ import com.intellij.psi.PsiElement;
 public interface FtlExpression extends PsiElement {
 
   @NotNull
+  List<FtlExpression> getExpressionList();
+
+  @NotNull
+  List<FtlIdentifier> getIdentifierList();
+
+  @NotNull
   List<FtlPrimary> getPrimaryList();
 
 }

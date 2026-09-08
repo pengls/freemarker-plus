@@ -1,4 +1,4 @@
-﻿.gradle/
+.gradle/
 build/
 .idea/
 .intellijPlatform/
@@ -7,6 +7,9 @@ out/
 local.properties
 .worktrees/
 .kotlin/
+
+# JFlex backup files produced by generateLexer
+src/main/gen/**/*.java~
 
 # IntelliJ test-framework debris dumped to the project root by `gradle test` runs
 /META-INF/

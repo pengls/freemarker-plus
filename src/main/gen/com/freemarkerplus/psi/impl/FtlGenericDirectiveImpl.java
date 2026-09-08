@@ -39,4 +39,10 @@ public class FtlGenericDirectiveImpl extends ASTWrapperPsiElement implements Ftl
     return findNotNullChildByClass(FtlDirectiveName.class);
   }
 
+  @Override
+  @NotNull
+  public List<FtlIdentifier> getIdentifierList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, FtlIdentifier.class);
+  }
+
 }

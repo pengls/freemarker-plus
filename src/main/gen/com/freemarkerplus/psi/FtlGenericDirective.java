@@ -13,4 +13,7 @@ public interface FtlGenericDirective extends PsiElement {
   @NotNull
   FtlDirectiveName getDirectiveName();
 
+  @NotNull
+  List<FtlIdentifier> getIdentifierList();
+
 }

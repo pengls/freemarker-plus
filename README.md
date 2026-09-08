@@ -4,35 +4,28 @@ An IntelliJ IDEA plugin that provides rich syntax highlighting and code navigati
 
 ## Features
 
+### Syntax Highlighting
+
 - **FreeMarker syntax highlighting** — comments, directives (`<#if>`, `<#list>`, `<#assign>`, ...), macro calls (`<@...>`), interpolation (`${...}`), strings, numbers, keywords, and operators.
-- **Expression support** — `?builtin` functions (with arguments, e.g. `${list?size}`, `${x?string("a","b")}`), `??` existence checks, parenthesized comparisons in directives (`<#if (a > b)>`), comparisons in interpolations, and block-level `<#assign x>...</#assign>`.
+- **Expression support** — `?builtin` functions (with arguments, e.g. `${list?size}`, `${x?string("a","b")}`), chained builtins, `??` existence checks, comparisons in interpolations, and parenthesized comparisons in directives (`<#if (a > b)>`).
 - **HTML highlighting** — full HTML tag, attribute, and content highlighting via IntelliJ's built-in HTML lexer.
 - **Embedded CSS highlighting** — CSS code inside `<style>` blocks is highlighted with the platform CSS lexer.
 - **Embedded JavaScript highlighting** — JavaScript code inside `<script>` blocks is highlighted with the platform JS lexer.
 - **Color scheme customization** — all FreeMarker token colors are configurable at **Settings → Editor → Color Scheme → Freemarker**.
 
-## Code Navigation (Phase 2)
+### Template Language Architecture
 
-- **Go to declaration** (Ctrl+B) — `#include`/`#import` file paths, `<@macro>` calls, `${variable}` references, `ns.member` namespaces.
-- **Find usages** (Alt+F7) — macros, functions, variables.
-- **Structure view** (Alt+7) — directives, macros, includes.
-- **Code folding** — `<#if>/<#list>/<#macro>/<#function>/<#switch>` blocks.
-- **Breadcrumbs** and **rename** (Shift+F6).
+- The HTML/XML data area of a template is parsed into real HTML/XML PSI — the platform template-language mechanism, same architecture as the official plugin — so platform HTML features (tag navigation, usage search, etc.) work inside templates.
 
-## HTML & JavaScript Navigation (Phase 2.5)
+### Code Navigation
 
-Since Phase 2.5, the HTML/CSS/JS data area of a `.ftl` file is parsed into real HTML PSI
-(the platform template-language mechanism, same architecture as the official plugin):
-
-- **`onclick="login()"` → JS function** — event-handler attributes resolve to the `login`
-  function declared in the same file's `<script>` block, and to functions in external `.js`
-  files referenced via `<script src="app.js">`.
-- **`<script src="app.js">` → file** — Ctrl+B on the `src` path opens the JavaScript file.
-- **HTML navigation** — tags and attributes get the platform's native navigation/usage support.
-
-> Note: JavaScript features require the IDE's JavaScript support (bundled in IntelliJ IDEA
-> Ultimate and WebStorm). On Community Edition without the JS plugin, HTML navigation still
-> works; JS-specific navigation is simply unavailable.
+- **Go to declaration** (Ctrl+B) — `#include`/`#import` file paths (multi-level relative paths), `<@macro>` calls (same file and cross-file via the declaration index), variable references (`${var}`, directive conditions), namespace members (`ns.member`), and macro/function parameters inside macro bodies.
+- **Find usages** (Alt+F7) — macros, functions, and variables, with cross-file search that respects the IDE search scope.
+- **Structure view** (Alt+7) — directives and macro calls; **breadcrumbs** show the enclosing directive context.
+- **Code folding** — `if/list/switch/macro/function/compress/noparse/escape` blocks, block-level `<#assign>`, and long `<#-- -->` comments.
+- **Rename** (Shift+F6) — macros, functions, and variables rename together with all their usages; import aliases are protected against accidental rename.
+- **Commenting** — Ctrl+/ wraps the selection in `<#-- -->` block comments.
+- **HTML/JavaScript navigation** — `onclick="login()"` resolves to the `login` function declared in the same file's `<script>` block or in external `.js` files; `<script src="app.js">` opens the referenced file. JavaScript features require the IDE's JavaScript support (bundled in IntelliJ IDEA Ultimate and WebStorm); on Community Edition without the JS plugin, HTML navigation still works.
 
 ## Supported File Types
 

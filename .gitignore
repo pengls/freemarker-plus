@@ -11,6 +11,9 @@ local.properties
 # JFlex backup files produced by generateLexer
 src/main/gen/**/*.java~
 
+# JetBrains Marketplace upload token (never commit)
+.marketplace-token
+
 # IntelliJ test-framework debris dumped to the project root by `gradle test` runs
 /META-INF/
 /colorSchemes/

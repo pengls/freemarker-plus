@@ -61,6 +61,14 @@ Colors follow your active color scheme and are anchored to standard IntelliJ lan
 
 ## Installation
 
+### From JetBrains Marketplace
+
+1. In IntelliJ IDEA, go to **Settings → Plugins → Marketplace**.
+2. Search for **Freemarker Plus** and click **Install**.
+3. Restart the IDE.
+
+Plugin page: <https://plugins.jetbrains.com/plugin/33948-freemarker-plus>
+
 ### From ZIP (Manual)
 
 1. Download the `freemarker-plus-0.4.0.zip` from the releases.
@@ -155,6 +163,22 @@ For HTML/JavaScript navigation, open `examples/js-navigation.ftl` (with `example
 | IPGP             | 2.16.0  |
 | Gradle           | 9.7.1   |
 | JDK              | 25      |
+
+## Publishing
+
+To publish a new version to the JetBrains Marketplace:
+
+```bash
+# 1. Generate an upload token at plugins.jetbrains.com (avatar → Settings → Security →
+#    Generate new token, with Upload permission), then set it as an environment variable:
+$env:JETBRAINS_MARKETPLACE_TOKEN = "perm-..."
+
+# 2. Build and upload (uploads build/distributions/<name>-<version>.zip):
+./gradlew.bat publishPlugin
+```
+
+The upload lands in the default release channel and goes through JetBrains approval
+before it becomes publicly visible.
 
 ## License
 

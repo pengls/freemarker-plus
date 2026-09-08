@@ -8,6 +8,17 @@
         and HTML/JavaScript navigation (event-handler attributes resolve to script functions, &lt;script src&gt; to files).
     ]]></description>
 
+    <change-notes><![CDATA[
+        <b>0.4.0</b>
+        <ul>
+            <li>Expression support: <code>?builtin</code> functions with arguments (<code>${list?size}</code>, <code>${x?string("a","b")}</code>), chained builtins, and <code>??</code> existence checks — no more red syntax in real-world templates.</li>
+            <li>Comparisons: parenthesized <code>&gt;</code>/<code>&lt;</code>/<code>&gt;=</code>/<code>&lt;=</code> inside directives (<code>&lt;#if (a &gt; b)&gt;</code>) and inside interpolations.</li>
+            <li>Block-level <code>&lt;#assign x&gt;...&lt;/#assign&gt;</code> parsing and folding; <code>&lt;#escape x as html&gt;</code> now parses.</li>
+            <li>Navigation: macro/function parameters resolve as variables inside macro bodies; multi-level <code>&lt;#import "partials/lib.ftl"&gt;</code> paths now resolve.</li>
+            <li>Editor: Ctrl+/ block commenting with <code>&lt;#-- --&gt;</code>; folding for <code>compress/noparse/escape</code> and long comments; more precise Find Usages type labels.</li>
+        </ul>
+    ]]></change-notes>
+
     <idea-version since-build="262" until-build="262.*"/>
 
     <depends>com.intellij.modules.platform</depends>
